@@ -1,21 +1,17 @@
-const express = require('express');
+// server.js
 const mongoose = require('mongoose');
-const cors = require('cors');
-const dotenv = require('dotenv');
+const app = require('./app');
+require('dotenv').config();
 const path = require('path');
+const cors = require('cors');
 const connectDB = require('./config/db');
 
-// Load environment variables
-dotenv.config();
-
-const app = require('./app');
-
 // Connect to MongoDB
-connectDB();
+connectDB(); // your existing DB connection function
 
-// Middleware - Enable CORS for all routes
+// Enable CORS globally (keep your settings)
 app.use(cors({
-    origin: '*',  // Allow all origins for now
+    origin: '*',
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization'],
     credentials: true
@@ -23,6 +19,8 @@ app.use(cors({
 
 // Handle preflight requests
 app.options('*', cors());
+
+// Body parsers
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
@@ -37,29 +35,29 @@ app.use('/css', express.static(path.join(__dirname, '../frontend/css')));
 app.use('/js', express.static(path.join(__dirname, '../frontend/js')));
 app.use('/images', express.static(path.join(__dirname, '../frontend/images')));
 
-// Route for the root URL to serve login.html
+// Route for root URL to serve login.html
 app.get(['/', '/login'], (req, res) => {
-  res.sendFile(path.join(__dirname, '../frontend/pages/login.html'));
+    res.sendFile(path.join(__dirname, '../frontend/pages/login.html'));
 });
 
-// Route for index.html (admin dashboard)
+// Route for admin dashboard
 app.get('/index.html', (req, res) => {
-  res.sendFile(path.join(__dirname, '../frontend/pages/index.html'));
+    res.sendFile(path.join(__dirname, '../frontend/pages/index.html'));
 });
 
-// Handle all other HTML routes by serving the login page (client-side routing will handle the rest)
+// Handle all other HTML routes by serving login page
 app.get('*.html', (req, res) => {
-  res.sendFile(path.join(__dirname, '../frontend/pages/login.html'));
+    res.sendFile(path.join(__dirname, '../frontend/pages/login.html'));
 });
 
-// API Routes
+// ------------------- API ROUTES -------------------
+// Import API routes
 const authRoutes = require('./routes/authRoutes');
 const assignmentRoutes = require('./routes/assignmentRoutes');
 const gradeRoutes = require('./routes/gradesRoutes');
 const announcementRoutes = require('./routes/announcementRoutes');
 const profileRoutes = require('./routes/profileRoutes');
 const resourceRoutes = require('./routes/resourceRoutes');
-// const reportCardRoutes = require('./routes/reportCardRoutes'); // disabled
 const clubRoutes = require('./routes/clubs');
 const bookRoutes = require('./routes/books');
 const eventRoutes = require('./routes/events');
@@ -69,7 +67,7 @@ const schoolUserRoutes = require('./routes/schoolUserRoutes');
 const contactRoutes = require('./routes/contact');
 const healthRoutes = require('./routes/health');
 
-// Mount routes
+// Mount API routes
 app.use('/api/auth', authRoutes);
 app.use('/api/assignments', assignmentRoutes);
 app.use('/api/grades', gradeRoutes);
@@ -85,13 +83,18 @@ app.use('/api/users', schoolUserRoutes);
 app.use('/api/contact', contactRoutes);
 app.use('/api/health', healthRoutes);
 
-// Fallback: if no API route matches, serve frontend index.html (important for login/dashboard)
+// Fallback for unknown routes (important for login/dashboard)
 app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, '../frontend', 'login.html'));
+    res.sendFile(path.join(__dirname, '../frontend', 'login.html'));
 });
 
-// Start server
+// ------------------- START SERVER -------------------
+// Use the environment PORT or default to 5000
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
-  console.log(`🚀 Server running on port ${PORT}`);
+
+// Start server **after MongoDB is connected**
+mongoose.connection.once('open', () => {
+    app.listen(PORT, () => {
+        console.log(`🚀 Server running in ${process.env.NODE_ENV || 'development'} mode on port ${PORT}`);
+    });
 });

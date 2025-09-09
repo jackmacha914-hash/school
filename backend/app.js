@@ -12,7 +12,7 @@ require('dotenv').config({
     : path.resolve(__dirname, '.env') // Local .env fallback
 });
 
-// Import routes
+// ------------------- ROUTES -------------------
 const authRoutes = require('./routes/authRoutes');
 const gradeRoutes = require('./routes/gradesRoutes');
 const announcementRoutes = require('./routes/announcementRoutes');
@@ -33,24 +33,24 @@ const marksRoutes = require('./routes/marksRoutes');
 const userRoutes = require('./routes/userRoutes');
 const feesRoutes = require('./routes/fees');
 
-// Middleware
+// ------------------- MIDDLEWARE -------------------
 const requestLogger = require('./middleware/requestLogger');
 const corsMiddleware = require('./middleware/cors');
 
 const app = express();
 
-// Body parsers
+// ------------------- BODY PARSERS -------------------
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 
-// Enable CORS
+// ------------------- CORS -------------------
 app.use(cors());
 app.use(corsMiddleware);
 
-// Logging
+// ------------------- LOGGING -------------------
 app.use(requestLogger);
 
-// Create static directories if missing
+// ------------------- STATIC DIRECTORIES -------------------
 const uploadsDir = path.join(__dirname, 'uploads');
 const profilePhotosDir = path.join(uploadsDir, 'profile-photos');
 const reportCardsDir = path.join(__dirname, '../frontend_public/uploads/report-cards');
@@ -67,7 +67,7 @@ app.use('/css', express.static(path.join(__dirname, '../frontend_public/css')));
 app.use('/js', express.static(path.join(__dirname, '../frontend_public/js')));
 app.use(express.static(path.join(__dirname, '../frontend_public/pages')));
 
-// Frontend pages
+// ------------------- FRONTEND ROUTES -------------------
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, '../frontend_public/pages/login.html'));
 });
@@ -81,12 +81,12 @@ app.get('/teacher', (req, res) => {
   res.sendFile(path.join(__dirname, '../frontend_public/pages/teacher.html'));
 });
 
-// Fallback for unknown routes
+// Fallback for unknown frontend routes
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, '../frontend_public/pages/login.html'));
 });
 
-// API routes
+// ------------------- API ROUTES -------------------
 app.use('/api/auth', authRoutes);
 app.use('/api/grades', gradeRoutes);
 app.use('/api/announcements', announcementRoutes);
@@ -106,18 +106,12 @@ app.use('/api/classes', classRoutes);
 app.use('/api/marks', marksRoutes);
 app.use('/api/fees', feesRoutes);
 
-// MongoDB connection
+// ------------------- MONGODB CONNECTION -------------------
 mongoose.connect(process.env.MONGODB_URI, {
   useNewUrlParser: true,
   useUnifiedTopology: true
 })
 .then(() => console.log('MongoDB connected successfully'))
 .catch(err => console.error('MongoDB connection error:', err));
-
-// Listen on Render port
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
-  console.log(`Server running in ${process.env.NODE_ENV} mode on port ${PORT}`);
-});
 
 module.exports = app;
