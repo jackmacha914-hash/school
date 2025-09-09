@@ -1,57 +1,54 @@
-const express = require('express'); // <-- ADD THIS
-const mongoose = require('mongoose');
-const app = require('./app');
-require('dotenv').config();
+const express = require('express'); 
 const path = require('path');
 const cors = require('cors');
+const mongoose = require('mongoose');
+require('dotenv').config();
+
+const app = express(); // Use express app here
 const connectDB = require('./config/db');
 
-// Connect to MongoDB
-connectDB(); // your existing DB connection function
+// ------------------- CONNECT TO MONGODB -------------------
+connectDB(); // This will use process.env.MONGO_URI or fallback
 
-// Enable CORS globally (keep your settings)
+// ------------------- MIDDLEWARE -------------------
 app.use(cors({
-    origin: '*',
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization'],
-    credentials: true
+  origin: '*',
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: true
 }));
-
-// Handle preflight requests
 app.options('*', cors());
 
 // Body parsers
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Serve favicon.ico
-app.get('/favicon.ico', (req, res) => {
-    res.sendFile(path.join(__dirname, '../frontend/favicon.ico'), { headers: { 'Content-Type': 'image/x-icon' } });
-});
-
-// Serve static files from frontend directories
+// Serve static frontend files
 app.use(express.static(path.join(__dirname, '../frontend')));
 app.use('/css', express.static(path.join(__dirname, '../frontend/css')));
 app.use('/js', express.static(path.join(__dirname, '../frontend/js')));
 app.use('/images', express.static(path.join(__dirname, '../frontend/images')));
 
-// Route for root URL to serve login.html
+// Serve favicon
+app.get('/favicon.ico', (req, res) => {
+  res.sendFile(path.join(__dirname, '../frontend/favicon.ico'), { headers: { 'Content-Type': 'image/x-icon' } });
+});
+
+// ------------------- HTML ROUTES -------------------
 app.get(['/', '/login'], (req, res) => {
-    res.sendFile(path.join(__dirname, '../frontend/pages/login.html'));
+  res.sendFile(path.join(__dirname, '../frontend/pages/login.html'));
 });
 
-// Route for admin dashboard
 app.get('/index.html', (req, res) => {
-    res.sendFile(path.join(__dirname, '../frontend/pages/index.html'));
+  res.sendFile(path.join(__dirname, '../frontend/pages/index.html'));
 });
 
-// Handle all other HTML routes by serving login page
+// Fallback for all other HTML requests
 app.get('*.html', (req, res) => {
-    res.sendFile(path.join(__dirname, '../frontend/pages/login.html'));
+  res.sendFile(path.join(__dirname, '../frontend/pages/login.html'));
 });
 
 // ------------------- API ROUTES -------------------
-// Import API routes
 const authRoutes = require('./routes/authRoutes');
 const assignmentRoutes = require('./routes/assignmentRoutes');
 const gradeRoutes = require('./routes/gradesRoutes');
@@ -67,7 +64,6 @@ const schoolUserRoutes = require('./routes/schoolUserRoutes');
 const contactRoutes = require('./routes/contact');
 const healthRoutes = require('./routes/health');
 
-// Mount API routes
 app.use('/api/auth', authRoutes);
 app.use('/api/assignments', assignmentRoutes);
 app.use('/api/grades', gradeRoutes);
@@ -83,18 +79,18 @@ app.use('/api/users', schoolUserRoutes);
 app.use('/api/contact', contactRoutes);
 app.use('/api/health', healthRoutes);
 
-// Fallback for unknown routes (important for login/dashboard)
+// Fallback for unknown routes
 app.get('*', (req, res) => {
-    res.sendFile(path.join(__dirname, '../frontend', 'login.html'));
+  res.sendFile(path.join(__dirname, '../frontend/pages/login.html'));
 });
 
 // ------------------- START SERVER -------------------
-// Use the environment PORT or default to 5000
 const PORT = process.env.PORT || 5000;
 
-// Start server **after MongoDB is connected**
+// Start server after MongoDB connection is ready
 mongoose.connection.once('open', () => {
-    app.listen(PORT, () => {
-        console.log(`🚀 Server running in ${process.env.NODE_ENV || 'development'} mode on port ${PORT}`);
-    });
+  console.log('✅ MongoDB Connected');
+  app.listen(PORT, () => {
+    console.log(`🚀 Server running in ${process.env.NODE_ENV || 'development'} mode on port ${PORT}`);
+  });
 });
