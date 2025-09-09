@@ -2,14 +2,10 @@ const mongoose = require('mongoose');
 
 const connectDB = async () => {
   try {
-    // Read MONGO URI from environment variable
+    // Use MONGODB_URI which you will set in Render
     const mongoUri = process.env.MONGODB_URI;
 
-    if (!mongoUri) {
-      throw new Error(
-        "MongoDB URI is not defined. Make sure you set MONGODB_URI in .env or in Render Environment Variables."
-      );
-    }
+    if (!mongoUri) throw new Error("MongoDB URI is not defined");
 
     const conn = await mongoose.connect(mongoUri, {
       useNewUrlParser: true,
@@ -17,8 +13,8 @@ const connectDB = async () => {
     });
 
     console.log(`✅ MongoDB Connected: ${conn.connection.host}`);
-  } catch (err) {
-    console.error(`❌ MongoDB connection error: ${err.message}`);
+  } catch (error) {
+    console.error(`❌ MongoDB connection error: ${error.message}`);
     process.exit(1);
   }
 };
