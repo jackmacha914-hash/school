@@ -1,29 +1,29 @@
-const express = require('express'); 
+const express = require('express');
+const mongoose = require('mongoose');
 const path = require('path');
 const cors = require('cors');
-const mongoose = require('mongoose');
 require('dotenv').config();
 
-const app = express(); // Use express app here
 const connectDB = require('./config/db');
-
-// ------------------- CONNECT TO MONGODB -------------------
-connectDB(); // This will use process.env.MONGO_URI or fallback
+const app = express();
 
 // ------------------- MIDDLEWARE -------------------
+// Connect to MongoDB
+connectDB();
+
+// Enable CORS
 app.use(cors({
-  origin: '*',
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
-  credentials: true
+    origin: '*',
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+    credentials: true
 }));
-app.options('*', cors());
 
 // Body parsers
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Serve static frontend files
+// Serve static files
 app.use(express.static(path.join(__dirname, '../frontend')));
 app.use('/css', express.static(path.join(__dirname, '../frontend/css')));
 app.use('/js', express.static(path.join(__dirname, '../frontend/js')));
@@ -31,24 +31,11 @@ app.use('/images', express.static(path.join(__dirname, '../frontend/images')));
 
 // Serve favicon
 app.get('/favicon.ico', (req, res) => {
-  res.sendFile(path.join(__dirname, '../frontend/favicon.ico'), { headers: { 'Content-Type': 'image/x-icon' } });
+    res.sendFile(path.join(__dirname, '../frontend/favicon.ico'), { headers: { 'Content-Type': 'image/x-icon' } });
 });
 
-// ------------------- HTML ROUTES -------------------
-app.get(['/', '/login'], (req, res) => {
-  res.sendFile(path.join(__dirname, '../frontend/pages/login.html'));
-});
-
-app.get('/index.html', (req, res) => {
-  res.sendFile(path.join(__dirname, '../frontend/pages/index.html'));
-});
-
-// Fallback for all other HTML requests
-app.get('*.html', (req, res) => {
-  res.sendFile(path.join(__dirname, '../frontend/pages/login.html'));
-});
-
-// ------------------- API ROUTES -------------------
+// ------------------- ROUTES -------------------
+// Example: adjust paths to your route files
 const authRoutes = require('./routes/authRoutes');
 const assignmentRoutes = require('./routes/assignmentRoutes');
 const gradeRoutes = require('./routes/gradesRoutes');
@@ -64,6 +51,7 @@ const schoolUserRoutes = require('./routes/schoolUserRoutes');
 const contactRoutes = require('./routes/contact');
 const healthRoutes = require('./routes/health');
 
+// Mount API routes
 app.use('/api/auth', authRoutes);
 app.use('/api/assignments', assignmentRoutes);
 app.use('/api/grades', gradeRoutes);
@@ -79,18 +67,22 @@ app.use('/api/users', schoolUserRoutes);
 app.use('/api/contact', contactRoutes);
 app.use('/api/health', healthRoutes);
 
-// Fallback for unknown routes
-app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, '../frontend/pages/login.html'));
+// Serve frontend pages
+app.get(['/', '/login'], (req, res) => {
+    res.sendFile(path.join(__dirname, '../frontend/pages/login.html'));
+});
+app.get('/index.html', (req, res) => {
+    res.sendFile(path.join(__dirname, '../frontend/pages/index.html'));
+});
+app.get('*.html', (req, res) => {
+    res.sendFile(path.join(__dirname, '../frontend/pages/login.html'));
 });
 
 // ------------------- START SERVER -------------------
 const PORT = process.env.PORT || 5000;
 
-// Start server after MongoDB connection is ready
 mongoose.connection.once('open', () => {
-  console.log('✅ MongoDB Connected');
-  app.listen(PORT, () => {
-    console.log(`🚀 Server running in ${process.env.NODE_ENV || 'development'} mode on port ${PORT}`);
-  });
+    app.listen(PORT, () => {
+        console.log(`🚀 Server running in ${process.env.NODE_ENV || 'development'} mode on port ${PORT}`);
+    });
 });
