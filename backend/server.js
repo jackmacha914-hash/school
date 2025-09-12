@@ -1,35 +1,40 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const path = require('path');
-const cors = require('cors');
 require('dotenv').config();
 
 const connectDB = require('./config/db');
 const app = express();
 
-// ------------------- MIDDLEWARE -------------------
-// Connect to MongoDB
+// ------------------- MONGODB -------------------
 connectDB();
 
-// Allowed origins
+// ------------------- ALLOWED ORIGINS -------------------
 const allowedOrigins = [
   process.env.FRONTEND_URL || "https://school-93dy.onrender.com", // frontend on Render
   "http://localhost:3000" // local dev
 ];
 
 // ------------------- CORS -------------------
-app.use(cors({
-  origin: function(origin, callback) {
-    if (!origin || allowedOrigins.includes(origin)) {
-      callback(null, origin); // ✅ echo the request origin
-    } else {
-      callback(new Error("Not allowed by CORS"));
-    }
-  },
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'Accept'],
-  credentials: true
-}));
+app.use((req, res, next) => {
+  const origin = req.headers.origin;
+
+  // Allow the origin if it's in the whitelist
+  if (origin && allowedOrigins.includes(origin)) {
+    res.setHeader("Access-Control-Allow-Origin", origin);
+    res.setHeader("Access-Control-Allow-Credentials", "true");
+    res.setHeader("Access-Control-Allow-Methods", "GET,POST,PUT,PATCH,DELETE,OPTIONS");
+    res.setHeader("Access-Control-Allow-Headers", "Content-Type,Authorization,Accept");
+    res.setHeader("Access-Control-Expose-Headers", "Content-Length,Content-Range");
+  }
+
+  // Preflight request handling
+  if (req.method === "OPTIONS") {
+    return res.sendStatus(204);
+  }
+
+  next();
+});
 
 // Optional debug for headers
 app.use((req, res, next) => {
