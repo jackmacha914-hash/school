@@ -35,7 +35,6 @@ const feesRoutes = require('./routes/fees');
 
 // ------------------- MIDDLEWARE -------------------
 const requestLogger = require('./middleware/requestLogger');
-const corsMiddleware = require('./middleware/cors');
 
 const app = express();
 
@@ -45,14 +44,14 @@ app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 
 // ------------------- CORS -------------------
 const allowedOrigins = [
-  process.env.FRONTEND_URL || "https://school-93dy.onrender.com", // your frontend
-  "http://localhost:3000" // dev
+  process.env.FRONTEND_URL || "https://school-93dy.onrender.com", // frontend on Render
+  "http://localhost:3000" // local dev
 ];
 
 app.use(cors({
   origin: function (origin, callback) {
     if (!origin || allowedOrigins.includes(origin)) {
-      callback(null, origin); // echo origin
+      callback(null, origin); // ✅ echo the request origin
     } else {
       callback(new Error("Not allowed by CORS"));
     }
@@ -62,7 +61,7 @@ app.use(cors({
   credentials: true
 }));
 
-// Explicitly handle preflight
+// Explicit preflight handling
 app.options('*', (req, res) => {
   const origin = req.headers.origin;
   if (allowedOrigins.includes(origin)) {
@@ -87,7 +86,6 @@ const reportCardsDir = path.join(__dirname, '../frontend_public/uploads/report-c
   if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
 });
 
-// Serve static files
 app.use('/uploads', express.static(uploadsDir));
 app.use('/uploads/profile-photos', express.static(profilePhotosDir));
 app.use('/report-cards', express.static(reportCardsDir));
@@ -109,7 +107,7 @@ app.get('/teacher', (req, res) => {
   res.sendFile(path.join(__dirname, '../frontend_public/pages/teacher.html'));
 });
 
-// Fallback for unknown frontend routes
+// fallback
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, '../frontend_public/pages/login.html'));
 });
@@ -139,7 +137,7 @@ mongoose.connect(process.env.MONGODB_URI, {
   useNewUrlParser: true,
   useUnifiedTopology: true
 })
-.then(() => console.log('MongoDB connected successfully'))
-.catch(err => console.error('MongoDB connection error:', err));
+.then(() => console.log('✅ MongoDB connected successfully'))
+.catch(err => console.error('❌ MongoDB connection error:', err));
 
 module.exports = app;
