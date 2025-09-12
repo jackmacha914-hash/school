@@ -32,6 +32,14 @@ app.use(cors({
   credentials: true
 }));
 
+app.use((req, res, next) => {
+  res.on('finish', () => {
+    console.log("👉 Response headers:", res.getHeaders()["access-control-allow-origin"]);
+  });
+  next();
+});
+
+
 // Explicitly handle preflight requests
 app.options('*', (req, res) => {
   const origin = req.headers.origin;
