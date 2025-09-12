@@ -18,11 +18,16 @@ const allowedOrigins = [
 
 // ------------------- CORS MIDDLEWARE -------------------
 app.use(cors({
-  origin: function(origin, callback) {
-    if (!origin || allowedOrigins.includes(origin.replace(/\/$/, ""))) {
-      callback(null, origin); // echo the allowed origin
+  origin: function (origin, callback) {
+    if (!origin) {
+      // Requests like direct page loads (no Origin header)
+      return callback(null, true);
+    }
+    const cleanedOrigin = origin.replace(/\/$/, "");
+    if (allowedOrigins.includes(cleanedOrigin)) {
+      return callback(null, true); // allow this origin
     } else {
-      callback(new Error("Not allowed by CORS"));
+      return callback(new Error("Not allowed by CORS"));
     }
   },
   credentials: true,
