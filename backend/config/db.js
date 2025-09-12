@@ -2,10 +2,15 @@ const mongoose = require('mongoose');
 
 const connectDB = async () => {
   try {
-    // Use MONGODB_URI which you will set in Render
     const mongoUri = process.env.MONGO_URI;
 
-    if (!mongoUri) throw new Error("MongoDB URI is not defined");
+    if (!mongoUri) {
+      throw new Error("❌ MongoDB URI is not defined in environment variables (MONGO_URI).");
+    }
+
+    // Debug log – hide password if present
+    const safeUri = mongoUri.replace(/:\/\/.*:.*@/, '://<username>:<password>@');
+    console.log("🔍 Using MongoDB URI:", safeUri);
 
     const conn = await mongoose.connect(mongoUri, {
       useNewUrlParser: true,
@@ -20,3 +25,4 @@ const connectDB = async () => {
 };
 
 module.exports = connectDB;
+
