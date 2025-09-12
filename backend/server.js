@@ -1,54 +1,32 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const path = require('path');
-const cors = require('cors');
 require('dotenv').config();
 
 const connectDB = require('./config/db');
+const corsMiddleware = require('./middleware/cors'); // <- your custom CORS middleware
 const app = express();
 
 // ------------------- MONGODB -------------------
 connectDB();
 
-// ------------------- ALLOWED ORIGINS -------------------
-const allowedOrigins = [
-  (process.env.FRONTEND_URL || "https://school-93dy.onrender.com").replace(/\/$/, ""),
-  "http://localhost:3000"
-];
+// ------------------- BODY PARSERS -------------------
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
-// ------------------- CORS MIDDLEWARE -------------------
-app.use(cors({
-  origin: function (origin, callback) {
-    if (!origin) {
-      // Requests like direct page loads (no Origin header)
-      return callback(null, true);
-    }
-    const cleanedOrigin = origin.replace(/\/$/, "");
-    if (allowedOrigins.includes(cleanedOrigin)) {
-      return callback(null, true); // allow this origin
-    } else {
-      return callback(new Error("Not allowed by CORS"));
-    }
-  },
-  credentials: true,
-  methods: ['GET','POST','PUT','PATCH','DELETE','OPTIONS'],
-  allowedHeaders: ['Content-Type','Authorization','Accept']
-}));
+// ------------------- CORS -------------------
+app.use(corsMiddleware);
 
 // ------------------- DEBUG MIDDLEWARE -------------------
 app.use((req, res, next) => {
-  res.on("finish", () => {
+  res.on('finish', () => {
     console.log(
       `[${new Date().toISOString()}] ${req.method} ${req.originalUrl} -> Access-Control-Allow-Origin:`,
-      res.getHeader("access-control-allow-origin")
+      res.getHeader('Access-Control-Allow-Origin')
     );
   });
   next();
 });
-
-// ------------------- BODY PARSERS -------------------
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
 
 // ------------------- STATIC FILES -------------------
 app.use(express.static(path.join(__dirname, '../frontend')));
@@ -98,6 +76,5 @@ mongoose.connection.once('open', () => {
     console.log(
       `🚀 Server running in ${process.env.NODE_ENV || 'development'} mode on port ${PORT}`
     );
-    console.log("✅ Allowed Origins:", allowedOrigins);
   });
 });
