@@ -47,16 +47,18 @@ document.addEventListener('DOMContentLoaded', function() {
 
             try {
                 console.log('Attempting login with:', { email });
-                const API_URL = (window.API_CONFIG || API_CONFIG || {}).AUTH_URL || 'https://school-management-system-av07.onrender.com/api/auth';
+                const API_URL = (window.API_CONFIG || API_CONFIG || {}).AUTH_URL || 
+                                'https://school-management-system-av07.onrender.com/api/auth';
+
                 const response = await fetch(`${API_URL}/login`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        'Accept': 'application/json',
-                        'Origin': window.location.origin
+                        'Accept': 'application/json'
+                        // ❌ Removed manual "Origin" header (browser handles this automatically)
                     },
                     body: JSON.stringify({ email, password }),
-                    credentials: 'include'
+                    credentials: 'include' // keep this for cookies/sessions
                 });
                 
                 console.log('Login response status:', response.status);
@@ -94,13 +96,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 
             } catch (error) {
                 console.error('Login error:', error);
-                // Show error to user
                 const errorMessage = error.message.includes('Failed to fetch') 
                     ? 'Unable to connect to server. Please check your connection.'
                     : error.message || 'Login failed. Please check your credentials and try again.';
                 showError(errorMessage);
                 
-                // Clear password field on error
                 const passwordField = document.getElementById('login-password');
                 if (passwordField) passwordField.value = '';
             }
@@ -155,7 +155,6 @@ document.addEventListener('DOMContentLoaded', function() {
             const role = document.getElementById('role')?.value;
             const studentClass = role === 'student' ? document.getElementById('class')?.value : '';
             
-            // Basic validation
             if (password !== confirmPassword) {
                 showError('Passwords do not match', 'register-message');
                 return;
@@ -167,17 +166,19 @@ document.addEventListener('DOMContentLoaded', function() {
             }
 
             try {
-                const API_BASE_URL = window.API_CONFIG?.API_BASE_URL || 'https://school-management-system-av07.onrender.com/api';
+                const API_BASE_URL = window.API_CONFIG?.API_BASE_URL || 
+                                     'https://school-management-system-av07.onrender.com/api';
+                
                 const response = await fetch(`${API_BASE_URL}/auth/register`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                     },
                     body: JSON.stringify({
-                        name: name,
-                        email: email,
-                        password: password,
-                        role: role,
+                        name,
+                        email,
+                        password,
+                        role,
                         studentClass: role === 'student' ? studentClass : undefined
                     })
                 });
@@ -194,14 +195,12 @@ document.addEventListener('DOMContentLoaded', function() {
                     throw new Error(data.message || data.msg || 'Registration failed');
                 }
                 
-                // Show success message
                 const registerMessage = document.getElementById('register-message');
                 if (registerMessage) {
                     registerMessage.textContent = 'Registration successful! Please login.';
                     registerMessage.style.color = 'green';
                     registerForm.reset();
                     
-                    // Auto switch to login form after 2 seconds
                     setTimeout(() => {
                         registerForm.style.display = 'none';
                         loginForm.style.display = 'block';
