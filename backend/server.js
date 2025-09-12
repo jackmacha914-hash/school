@@ -15,18 +15,27 @@ const allowedOrigins = [
   "http://localhost:3000"
 ];
 
-// ------------------- CORS -------------------
+// ------------------- CORS MIDDLEWARE -------------------
 app.use((req, res, next) => {
   let origin = req.headers.origin;
-  if (origin) origin = origin.replace(/\/$/, ""); // remove trailing slash
+  if (origin) origin = origin.replace(/\/$/, "");
 
   if (origin && allowedOrigins.includes(origin)) {
-    // Echo back the allowed origin
+    // Echo the allowed origin
     res.setHeader("Access-Control-Allow-Origin", origin);
     res.setHeader("Access-Control-Allow-Credentials", "true");
-    res.setHeader("Access-Control-Allow-Methods", "GET,POST,PUT,PATCH,DELETE,OPTIONS");
-    res.setHeader("Access-Control-Allow-Headers", "Content-Type,Authorization,Accept");
+    res.setHeader(
+      "Access-Control-Allow-Methods",
+      "GET,POST,PUT,PATCH,DELETE,OPTIONS"
+    );
+    res.setHeader(
+      "Access-Control-Allow-Headers",
+      "Content-Type,Authorization,Accept"
+    );
     res.setHeader("Access-Control-Expose-Headers", "Content-Length,Content-Range");
+  } else if (origin) {
+    // Origin not allowed
+    return res.status(403).json({ message: "Not allowed by CORS" });
   }
 
   // Handle preflight requests
@@ -35,10 +44,13 @@ app.use((req, res, next) => {
   next();
 });
 
-// Optional debug for headers
+// ------------------- DEBUG MIDDLEWARE -------------------
 app.use((req, res, next) => {
-  res.on('finish', () => {
-    console.log("👉 Response header Access-Control-Allow-Origin:", res.getHeader("access-control-allow-origin"));
+  res.on("finish", () => {
+    console.log(
+      `[${new Date().toISOString()}] ${req.method} ${req.originalUrl} -> Access-Control-Allow-Origin:`,
+      res.getHeader("access-control-allow-origin")
+    );
   });
   next();
 });
@@ -53,7 +65,7 @@ app.use('/css', express.static(path.join(__dirname, '../frontend/css')));
 app.use('/js', express.static(path.join(__dirname, '../frontend/js')));
 app.use('/images', express.static(path.join(__dirname, '../frontend/images')));
 
-// Serve favicon
+// ------------------- FAVICON -------------------
 app.get('/favicon.ico', (req, res) => {
   res.sendFile(path.join(__dirname, '../frontend/favicon.ico'), {
     headers: { 'Content-Type': 'image/x-icon' }
@@ -107,7 +119,9 @@ const PORT = process.env.PORT || 5000;
 
 mongoose.connection.once('open', () => {
   app.listen(PORT, () => {
-    console.log(`🚀 Server running in ${process.env.NODE_ENV || 'development'} mode on port ${PORT}`);
+    console.log(
+      `🚀 Server running in ${process.env.NODE_ENV || 'development'} mode on port ${PORT}`
+    );
     console.log("✅ Allowed Origins:", allowedOrigins);
   });
 });
