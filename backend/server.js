@@ -12,12 +12,25 @@ const app = express();
 connectDB();
 
 // Enable CORS
+const allowedOrigins = [
+  "https://school-93dy.onrender.com", // your frontend (Render)
+  "http://localhost:3000"             // local dev (optional)
+];
+
 app.use(cors({
-    origin: '*',
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization'],
-    credentials: true
+  origin: function (origin, callback) {
+    // allow requests with no origin (like mobile apps or curl)
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, origin);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: true
 }));
+
 
 // Body parsers
 app.use(express.json());
