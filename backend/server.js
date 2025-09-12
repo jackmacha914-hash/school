@@ -11,15 +11,15 @@ const app = express();
 // Connect to MongoDB
 connectDB();
 
-// Enable CORS
+// Enable CORS with environment-based config
 const allowedOrigins = [
-  "https://school-93dy.onrender.com", // your frontend (Render)
-  "http://localhost:3000"             // local dev (optional)
+  process.env.FRONTEND_URL || "https://school-93dy.onrender.com", // fallback to your Render frontend
+  "http://localhost:3000" // local dev (optional)
 ];
 
 app.use(cors({
   origin: function (origin, callback) {
-    // allow requests with no origin (like mobile apps or curl)
+    // allow requests with no origin (like curl or mobile apps)
     if (!origin || allowedOrigins.includes(origin)) {
       callback(null, origin);
     } else {
@@ -31,6 +31,11 @@ app.use(cors({
   credentials: true
 }));
 
+// Handle preflight requests
+app.options('*', cors({
+  origin: allowedOrigins,
+  credentials: true
+}));
 
 // Body parsers
 app.use(express.json());
@@ -44,11 +49,12 @@ app.use('/images', express.static(path.join(__dirname, '../frontend/images')));
 
 // Serve favicon
 app.get('/favicon.ico', (req, res) => {
-    res.sendFile(path.join(__dirname, '../frontend/favicon.ico'), { headers: { 'Content-Type': 'image/x-icon' } });
+  res.sendFile(path.join(__dirname, '../frontend/favicon.ico'), {
+    headers: { 'Content-Type': 'image/x-icon' }
+  });
 });
 
 // ------------------- ROUTES -------------------
-// Example: adjust paths to your route files
 const authRoutes = require('./routes/authRoutes');
 const assignmentRoutes = require('./routes/assignmentRoutes');
 const gradeRoutes = require('./routes/gradesRoutes');
@@ -82,20 +88,21 @@ app.use('/api/health', healthRoutes);
 
 // Serve frontend pages
 app.get(['/', '/login'], (req, res) => {
-    res.sendFile(path.join(__dirname, '../frontend/pages/login.html'));
+  res.sendFile(path.join(__dirname, '../frontend/pages/login.html'));
 });
 app.get('/index.html', (req, res) => {
-    res.sendFile(path.join(__dirname, '../frontend/pages/index.html'));
+  res.sendFile(path.join(__dirname, '../frontend/pages/index.html'));
 });
 app.get('*.html', (req, res) => {
-    res.sendFile(path.join(__dirname, '../frontend/pages/login.html'));
+  res.sendFile(path.join(__dirname, '../frontend/pages/login.html'));
 });
 
 // ------------------- START SERVER -------------------
 const PORT = process.env.PORT || 5000;
 
 mongoose.connection.once('open', () => {
-    app.listen(PORT, () => {
-        console.log(`🚀 Server running in ${process.env.NODE_ENV || 'development'} mode on port ${PORT}`);
-    });
+  app.listen(PORT, () => {
+    console.log(`🚀 Server running in ${process.env.NODE_ENV || 'development'} mode on port ${PORT}`);
+    console.log("✅ Allowed Origins:", allowedOrigins);
+  });
 });
