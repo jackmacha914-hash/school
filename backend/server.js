@@ -1,6 +1,7 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const path = require('path');
+const cors = require('cors');
 require('dotenv').config();
 
 const connectDB = require('./config/db');
@@ -16,33 +17,18 @@ const allowedOrigins = [
 ];
 
 // ------------------- CORS MIDDLEWARE -------------------
-app.use((req, res, next) => {
-  let origin = req.headers.origin;
-  if (origin) origin = origin.replace(/\/$/, "");
-
-  if (origin && allowedOrigins.includes(origin)) {
-    // Echo the allowed origin
-    res.setHeader("Access-Control-Allow-Origin", origin);
-    res.setHeader("Access-Control-Allow-Credentials", "true");
-    res.setHeader(
-      "Access-Control-Allow-Methods",
-      "GET,POST,PUT,PATCH,DELETE,OPTIONS"
-    );
-    res.setHeader(
-      "Access-Control-Allow-Headers",
-      "Content-Type,Authorization,Accept"
-    );
-    res.setHeader("Access-Control-Expose-Headers", "Content-Length,Content-Range");
-  } else if (origin) {
-    // Origin not allowed
-    return res.status(403).json({ message: "Not allowed by CORS" });
-  }
-
-  // Handle preflight requests
-  if (req.method === "OPTIONS") return res.sendStatus(204);
-
-  next();
-});
+app.use(cors({
+  origin: function(origin, callback) {
+    if (!origin || allowedOrigins.includes(origin.replace(/\/$/, ""))) {
+      callback(null, origin); // echo the allowed origin
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
+  credentials: true,
+  methods: ['GET','POST','PUT','PATCH','DELETE','OPTIONS'],
+  allowedHeaders: ['Content-Type','Authorization','Accept']
+}));
 
 // ------------------- DEBUG MIDDLEWARE -------------------
 app.use((req, res, next) => {
@@ -73,35 +59,20 @@ app.get('/favicon.ico', (req, res) => {
 });
 
 // ------------------- API ROUTES -------------------
-const authRoutes = require('./routes/authRoutes');
-const assignmentRoutes = require('./routes/assignmentRoutes');
-const gradeRoutes = require('./routes/gradesRoutes');
-const announcementRoutes = require('./routes/announcementRoutes');
-const profileRoutes = require('./routes/profileRoutes');
-const resourceRoutes = require('./routes/resourceRoutes');
-const clubRoutes = require('./routes/clubs');
-const bookRoutes = require('./routes/books');
-const eventRoutes = require('./routes/events');
-const accountRoutes = require('./routes/accounts');
-const statsRoutes = require('./routes/stats');
-const schoolUserRoutes = require('./routes/schoolUserRoutes');
-const contactRoutes = require('./routes/contact');
-const healthRoutes = require('./routes/health');
-
-app.use('/api/auth', authRoutes);
-app.use('/api/assignments', assignmentRoutes);
-app.use('/api/grades', gradeRoutes);
-app.use('/api/announcements', announcementRoutes);
-app.use('/api/profile', profileRoutes);
-app.use('/api/resources', resourceRoutes);
-app.use('/api/clubs', clubRoutes);
-app.use('/api/books', bookRoutes);
-app.use('/api/events', eventRoutes);
-app.use('/api/accounts', accountRoutes);
-app.use('/api/stats', statsRoutes);
-app.use('/api/users', schoolUserRoutes);
-app.use('/api/contact', contactRoutes);
-app.use('/api/health', healthRoutes);
+app.use('/api/auth', require('./routes/authRoutes'));
+app.use('/api/assignments', require('./routes/assignmentRoutes'));
+app.use('/api/grades', require('./routes/gradesRoutes'));
+app.use('/api/announcements', require('./routes/announcementRoutes'));
+app.use('/api/profile', require('./routes/profileRoutes'));
+app.use('/api/resources', require('./routes/resourceRoutes'));
+app.use('/api/clubs', require('./routes/clubs'));
+app.use('/api/books', require('./routes/books'));
+app.use('/api/events', require('./routes/events'));
+app.use('/api/accounts', require('./routes/accounts'));
+app.use('/api/stats', require('./routes/stats'));
+app.use('/api/users', require('./routes/schoolUserRoutes'));
+app.use('/api/contact', require('./routes/contact'));
+app.use('/api/health', require('./routes/health'));
 
 // ------------------- FRONTEND ROUTES -------------------
 app.get(['/', '/login'], (req, res) => {
