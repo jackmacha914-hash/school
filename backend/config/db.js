@@ -9,8 +9,22 @@ const connectDB = async () => {
     }
 
     // Debug log: show exactly what's coming from Render (with quotes/spaces if any)
-    console.log("🔍 Raw MONGO_URI =", JSON.stringify(mongoUri));
+    console.log("Raw MONGO_URI =", JSON.stringify(mongoUri));
 
     // Mask password before logging the URI
-    const safeUri = mongoUri.replace(/:\/\/.*:.*@/, '://<username>:<password>@');
-    console.log("🔍 Using M
+    const safeUri = mongoUri.replace(/:\/\/.*:.*@/, "://<username>:<password>@");
+    console.log("Using MongoDB URI:", safeUri);
+
+    const conn = await mongoose.connect(mongoUri, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+    });
+
+    console.log(`✅ MongoDB Connected: ${conn.connection.host}`);
+  } catch (error) {
+    console.error(`❌ MongoDB connection error: ${error.message}`);
+    process.exit(1);
+  }
+};
+
+module.exports = connectDB;
