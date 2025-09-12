@@ -17,47 +17,33 @@ const allowedOrigins = [
   "http://localhost:3000" // local dev
 ];
 
-// Configure CORS
+// ------------------- CORS -------------------
 app.use(cors({
-  origin: function (origin, callback) {
+  origin: function(origin, callback) {
     if (!origin || allowedOrigins.includes(origin)) {
-      // ✅ Echo back the origin instead of "*"
-      callback(null, origin);
+      callback(null, origin); // ✅ echo the request origin
     } else {
       callback(new Error("Not allowed by CORS"));
     }
   },
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'Accept'],
   credentials: true
 }));
 
+// Optional debug for headers
 app.use((req, res, next) => {
   res.on('finish', () => {
-    console.log("👉 Response headers:", res.getHeaders()["access-control-allow-origin"]);
+    console.log("👉 Response header Access-Control-Allow-Origin:", res.getHeader("access-control-allow-origin"));
   });
   next();
 });
 
-
-// Explicitly handle preflight requests
-app.options('*', (req, res) => {
-  const origin = req.headers.origin;
-  if (allowedOrigins.includes(origin)) {
-    res.setHeader("Access-Control-Allow-Origin", origin);
-    res.setHeader("Access-Control-Allow-Credentials", "true");
-    res.setHeader("Access-Control-Allow-Methods", "GET,POST,PUT,DELETE,OPTIONS");
-    res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
-    return res.sendStatus(200);
-  }
-  return res.sendStatus(403);
-});
-
-// Body parsers
+// ------------------- BODY PARSERS -------------------
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Serve static files
+// ------------------- STATIC FILES -------------------
 app.use(express.static(path.join(__dirname, '../frontend')));
 app.use('/css', express.static(path.join(__dirname, '../frontend/css')));
 app.use('/js', express.static(path.join(__dirname, '../frontend/js')));
@@ -70,7 +56,7 @@ app.get('/favicon.ico', (req, res) => {
   });
 });
 
-// ------------------- ROUTES -------------------
+// ------------------- API ROUTES -------------------
 const authRoutes = require('./routes/authRoutes');
 const assignmentRoutes = require('./routes/assignmentRoutes');
 const gradeRoutes = require('./routes/gradesRoutes');
@@ -86,7 +72,6 @@ const schoolUserRoutes = require('./routes/schoolUserRoutes');
 const contactRoutes = require('./routes/contact');
 const healthRoutes = require('./routes/health');
 
-// Mount API routes
 app.use('/api/auth', authRoutes);
 app.use('/api/assignments', assignmentRoutes);
 app.use('/api/grades', gradeRoutes);
@@ -102,7 +87,7 @@ app.use('/api/users', schoolUserRoutes);
 app.use('/api/contact', contactRoutes);
 app.use('/api/health', healthRoutes);
 
-// Serve frontend pages
+// ------------------- FRONTEND ROUTES -------------------
 app.get(['/', '/login'], (req, res) => {
   res.sendFile(path.join(__dirname, '../frontend/pages/login.html'));
 });
