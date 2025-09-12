@@ -11,24 +11,23 @@ connectDB();
 
 // ------------------- ALLOWED ORIGINS -------------------
 const allowedOrigins = [
-  process.env.FRONTEND_URL || "https://school-93dy.onrender.com", // frontend on Render
-  "http://localhost:3000" // local dev
+  process.env.FRONTEND_URL || "https://school-93dy.onrender.com",
+  "http://localhost:3000"
 ];
 
 // ------------------- CORS -------------------
 app.use((req, res, next) => {
   const origin = req.headers.origin;
 
-  // Allow the origin if it's in the whitelist
   if (origin && allowedOrigins.includes(origin)) {
-    res.setHeader("Access-Control-Allow-Origin", origin);
+    res.setHeader("Access-Control-Allow-Origin", origin); // Echo origin
     res.setHeader("Access-Control-Allow-Credentials", "true");
     res.setHeader("Access-Control-Allow-Methods", "GET,POST,PUT,PATCH,DELETE,OPTIONS");
     res.setHeader("Access-Control-Allow-Headers", "Content-Type,Authorization,Accept");
     res.setHeader("Access-Control-Expose-Headers", "Content-Length,Content-Range");
   }
 
-  // Preflight request handling
+  // Handle preflight requests
   if (req.method === "OPTIONS") {
     return res.sendStatus(204);
   }
