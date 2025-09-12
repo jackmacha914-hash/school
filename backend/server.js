@@ -11,16 +11,17 @@ const app = express();
 // Connect to MongoDB
 connectDB();
 
-// Enable CORS with environment-based config
+// Allowed origins
 const allowedOrigins = [
-  process.env.FRONTEND_URL || "https://school-93dy.onrender.com", // fallback to your Render frontend
-  "http://localhost:3000" // local dev (optional)
+  process.env.FRONTEND_URL || "https://school-93dy.onrender.com", // frontend on Render
+  "http://localhost:3000" // local dev
 ];
 
+// Configure CORS
 app.use(cors({
   origin: function (origin, callback) {
-    // allow requests with no origin (like curl or mobile apps)
     if (!origin || allowedOrigins.includes(origin)) {
+      // ✅ Echo back the origin instead of "*"
       callback(null, origin);
     } else {
       callback(new Error("Not allowed by CORS"));
@@ -31,11 +32,18 @@ app.use(cors({
   credentials: true
 }));
 
-// Handle preflight requests
-app.options('*', cors({
-  origin: allowedOrigins,
-  credentials: true
-}));
+// Explicitly handle preflight requests
+app.options('*', (req, res) => {
+  const origin = req.headers.origin;
+  if (allowedOrigins.includes(origin)) {
+    res.setHeader("Access-Control-Allow-Origin", origin);
+    res.setHeader("Access-Control-Allow-Credentials", "true");
+    res.setHeader("Access-Control-Allow-Methods", "GET,POST,PUT,DELETE,OPTIONS");
+    res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
+    return res.sendStatus(200);
+  }
+  return res.sendStatus(403);
+});
 
 // Body parsers
 app.use(express.json());
