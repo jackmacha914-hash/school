@@ -20,7 +20,8 @@ services:
     healthCheckPath: /api/health
     autoDeploy: true
     routes:
-      - path: /api/*
-        headers:
-          Access-Control-Allow-Origin: ""
-          Access-Control-Allow-Credentials: ""
+  - path: /api/*
+    headersRemove:
+      - Access-Control-Allow-Origin
+      - Access-Control-Allow-Credentials
+
