@@ -1,12 +1,14 @@
 // config/cors.js
+
+// ✅ Allowed origins (no regex, exact strings)
 const allowedOrigins = [
   // Development
-  /^http:\/\/localhost(:\d+)?$/,
-  /^http:\/\/127\.0\.0\.1(:\d+)?$/,
+  'http://localhost:3000',
+  'http://127.0.0.1:3000',
 
-  // Production: allow both with/without trailing slash, and optional www
-  /^https:\/\/(www\.)?school-93dy\.onrender\.com\/?$/,
-  /^https:\/\/(www\.)?school-management-system-av07\.onrender\.com\/?$/
+  // Production
+  'https://school-93dy.onrender.com',
+  'https://school-management-system-av07.onrender.com'
 ];
 
 module.exports = { allowedOrigins };
