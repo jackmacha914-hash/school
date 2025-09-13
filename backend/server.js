@@ -25,7 +25,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // -------------------------
-// Debug logging
+// Debug logging (CORS check)
 // -------------------------
 app.use((req, res, next) => {
   res.on('finish', () => {
@@ -38,14 +38,18 @@ app.use((req, res, next) => {
 });
 
 // -------------------------
-// Static assets
+// Static assets (frontend)
 // -------------------------
-app.use(express.static(path.join(__dirname, '../frontend')));
-app.use('/css', express.static(path.join(__dirname, '../frontend/css')));
-app.use('/js', express.static(path.join(__dirname, '../frontend/js')));
-app.use('/images', express.static(path.join(__dirname, '../frontend/images')));
+const publicFrontendPath = path.join(__dirname, 'public_frontend');
+const pagesPath = path.join(publicFrontendPath, 'pages');
+
+app.use(express.static(publicFrontendPath));
+app.use('/css', express.static(path.join(publicFrontendPath, 'css')));
+app.use('/js', express.static(path.join(publicFrontendPath, 'js')));
+app.use('/images', express.static(path.join(publicFrontendPath, 'images')));
+
 app.get('/favicon.ico', (req, res) => {
-  res.sendFile(path.join(__dirname, '../frontend/favicon.ico'), {
+  res.sendFile(path.join(publicFrontendPath, 'favicon.ico'), {
     headers: { 'Content-Type': 'image/x-icon' }
   });
 });
@@ -72,13 +76,15 @@ app.use('/api/health', require('./routes/health'));
 // Frontend routes
 // -------------------------
 app.get(['/', '/login'], (req, res) => {
-  res.sendFile(path.join(__dirname, '../frontend/pages/login.html'));
+  res.sendFile(path.join(pagesPath, 'login.html'));
 });
+
 app.get('/index.html', (req, res) => {
-  res.sendFile(path.join(__dirname, '../frontend/pages/index.html'));
+  res.sendFile(path.join(pagesPath, 'index.html'));
 });
+
 app.get('*.html', (req, res) => {
-  res.sendFile(path.join(__dirname, '../frontend/pages/login.html'));
+  res.sendFile(path.join(pagesPath, 'login.html'));
 });
 
 // -------------------------
