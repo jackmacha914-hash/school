@@ -1,14 +1,10 @@
 // config/cors.js
 
 // ✅ Allowed origins (no regex, exact strings)
+// backend/config/cors.js
 const allowedOrigins = [
-  // Development
-  'http://localhost:3000',
-  'http://127.0.0.1:3000',
-
-  // Production
-  'https://school-93dy.onrender.com',
-  'https://school-management-system-av07.onrender.com'
+  'https://school-93dy.onrender.com',  // Render app URL
+  'http://localhost:5000'              // Local dev
 ];
 
 module.exports = { allowedOrigins };
