@@ -2,8 +2,8 @@
 function getDashboardURL(role) {
     switch (role) {
         case 'admin':   return '/index.html';
-        case 'teacher': return '/teacher/dashboard.html';
-        case 'student': return '/student/dashboard.html';
+        case 'teacher': return '/teacher.html';
+        case 'student': return '/student.html';
         default:        return '/login.html';
     }
 }
