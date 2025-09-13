@@ -5,19 +5,28 @@ require('dotenv').config();
 
 const connectDB = require('./config/db');
 const corsMiddleware = require('./middleware/cors');
+
 const app = express();
 
-// MongoDB
+// -------------------------
+// Connect to MongoDB
+// -------------------------
 connectDB();
 
+// -------------------------
+// CORS – must be mounted first
+// -------------------------
+app.use(corsMiddleware);
+
+// -------------------------
 // Body parsers
+// -------------------------
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// CORS (must be before routes)
-app.use(corsMiddleware);
-
-// Debug
+// -------------------------
+// Debug logging
+// -------------------------
 app.use((req, res, next) => {
   res.on('finish', () => {
     console.log(
@@ -28,7 +37,9 @@ app.use((req, res, next) => {
   next();
 });
 
-// Static files & favicon
+// -------------------------
+// Static assets
+// -------------------------
 app.use(express.static(path.join(__dirname, '../frontend')));
 app.use('/css', express.static(path.join(__dirname, '../frontend/css')));
 app.use('/js', express.static(path.join(__dirname, '../frontend/js')));
@@ -39,7 +50,9 @@ app.get('/favicon.ico', (req, res) => {
   });
 });
 
+// -------------------------
 // API routes
+// -------------------------
 app.use('/api/auth', require('./routes/authRoutes'));
 app.use('/api/assignments', require('./routes/assignmentRoutes'));
 app.use('/api/grades', require('./routes/gradesRoutes'));
@@ -55,7 +68,9 @@ app.use('/api/users', require('./routes/schoolUserRoutes'));
 app.use('/api/contact', require('./routes/contact'));
 app.use('/api/health', require('./routes/health'));
 
+// -------------------------
 // Frontend routes
+// -------------------------
 app.get(['/', '/login'], (req, res) => {
   res.sendFile(path.join(__dirname, '../frontend/pages/login.html'));
 });
@@ -66,7 +81,9 @@ app.get('*.html', (req, res) => {
   res.sendFile(path.join(__dirname, '../frontend/pages/login.html'));
 });
 
+// -------------------------
 // Start server
+// -------------------------
 const PORT = process.env.PORT || 5000;
 mongoose.connection.once('open', () => {
   app.listen(PORT, () => {
