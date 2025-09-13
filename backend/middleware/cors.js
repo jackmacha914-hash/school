@@ -4,9 +4,6 @@ const { allowedOrigins } = require('../config/cors');
 const corsMiddleware = (req, res, next) => {
   let origin = req.headers.origin;
 
-  // Log incoming requests for debugging
-  console.log(`[${new Date().toISOString()}] ${req.method} ${req.originalUrl} - Origin:`, origin);
-
   // Always set Vary to avoid caching issues
   res.setHeader('Vary', 'Origin');
 
@@ -20,7 +17,6 @@ const corsMiddleware = (req, res, next) => {
   });
 
   if (isAllowed) {
-    // Only echo the origin when credentials are required
     res.setHeader('Access-Control-Allow-Origin', origin);
     res.setHeader('Access-Control-Allow-Credentials', 'true');
     res.setHeader('Access-Control-Allow-Methods', 'GET,POST,PUT,PATCH,DELETE,OPTIONS');
@@ -31,14 +27,14 @@ const corsMiddleware = (req, res, next) => {
     res.setHeader('Access-Control-Expose-Headers', 'Content-Length,Content-Range');
     res.setHeader('Access-Control-Max-Age', '86400'); // cache preflight 24 hours
 
-    // Handle preflight OPTIONS request
+    console.log(`[CORS ALLOWED] ${req.method} ${req.originalUrl} <- ${origin}`);
+
     if (req.method === 'OPTIONS') return res.sendStatus(204);
   } else if (origin) {
-    console.warn('CORS: Blocked request from origin:', origin);
+    console.warn(`[CORS BLOCKED] ${req.method} ${req.originalUrl} <- ${origin}`);
     return res.status(403).json({ message: 'Not allowed by CORS' });
   }
 
-  // Continue to next middleware
   next();
 };
 
