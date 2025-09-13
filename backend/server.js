@@ -4,7 +4,7 @@ const path = require('path');
 require('dotenv').config();
 
 const connectDB = require('./config/db');
-const corsMiddleware = require('./middleware/cors'); // <- your custom CORS middleware
+const corsMiddleware = require('./middleware/cors'); // your custom CORS
 const app = express();
 
 // ------------------- MONGODB -------------------
@@ -15,14 +15,14 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // ------------------- CORS -------------------
-app.use(corsMiddleware);
+app.use(corsMiddleware); // must come BEFORE routes
 
 // ------------------- DEBUG MIDDLEWARE -------------------
 app.use((req, res, next) => {
   res.on('finish', () => {
     console.log(
       `[${new Date().toISOString()}] ${req.method} ${req.originalUrl} -> Access-Control-Allow-Origin:`,
-      res.getHeader('Access-Control-Allow-Origin')
+      res.getHeader('access-control-allow-origin')
     );
   });
   next();
