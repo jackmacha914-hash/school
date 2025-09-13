@@ -1,30 +1,31 @@
-
-// backend/middleware/cors.js
-const { allowedOrigins } = require('../config/cors');
-
-module.exports = (req, res, next) => {
+// middleware/cors.js
+const corsMiddleware = (req, res, next) => {
   const origin = req.headers.origin;
+
+  // Always set vary
   res.setHeader('Vary', 'Origin');
 
-  if (origin && allowedOrigins.includes(origin)) {
-    res.setHeader('Access-Control-Allow-Origin', origin);
-    res.setHeader('Access-Control-Allow-Credentials', 'true');
+  // Only allow your deployed frontend
+  const allowedOrigin = "https://school-93dy.onrender.com";
+
+  if (origin === allowedOrigin) {
+    res.setHeader("Access-Control-Allow-Origin", allowedOrigin);
+    res.setHeader("Access-Control-Allow-Credentials", "true");
     res.setHeader(
-      'Access-Control-Allow-Methods',
-      'GET,POST,PUT,PATCH,DELETE,OPTIONS'
+      "Access-Control-Allow-Methods",
+      "GET,POST,PUT,PATCH,DELETE,OPTIONS"
     );
     res.setHeader(
-      'Access-Control-Allow-Headers',
-      'Content-Type,Authorization'
+      "Access-Control-Allow-Headers",
+      "Content-Type,Authorization,x-auth-token,X-Requested-With,Cache-Control"
     );
 
-    if (req.method === 'OPTIONS') {
+    if (req.method === "OPTIONS") {
       return res.sendStatus(204);
     }
-  } else if (origin) {
-    return res.status(403).json({ message: 'Not allowed by CORS' });
   }
 
   next();
 };
 
+module.exports = corsMiddleware;
