@@ -45,6 +45,15 @@ app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 // ------------------- CORS -------------------
 app.use(corsMiddleware);
 
+app.use((req, res, next) => {
+  res.on('finish', () => {
+    console.log(`[DEBUG] ${req.method} ${req.originalUrl} headers:`);
+    console.log('Access-Control-Allow-Origin:', res.getHeader('Access-Control-Allow-Origin'));
+    console.log('Access-Control-Allow-Credentials:', res.getHeader('Access-Control-Allow-Credentials'));
+  });
+  next();
+});
+
 // ------------------- LOGGING -------------------
 app.use(requestLogger);
 
