@@ -41,15 +41,15 @@ app.use((req, res, next) => {
 // Static assets (frontend)
 // -------------------------
 const publicFrontendPath = path.join(__dirname, 'frontend_public');
-const pagesPath = path.join(frontendpublicPath, 'pages');
+const pagesPath = path.join(publicFrontendPath, 'pages');
 
-app.use(express.static(frontendpublicPath));
-app.use('/css', express.static(path.join(frontendpublicPath, 'css')));
-app.use('/js', express.static(path.join(frontendpublicPath, 'js')));
-app.use('/images', express.static(path.join(frontendpublicPath, 'images')));
+app.use(express.static(publicFrontendPath));
+app.use('/css', express.static(path.join(publicFrontendPath, 'css')));
+app.use('/js', express.static(path.join(publicFrontendPath, 'js')));
+app.use('/images', express.static(path.join(publicFrontendPath, 'images')));
 
 app.get('/favicon.ico', (req, res) => {
-  res.sendFile(path.join(frontendpublicPath, 'favicon.ico'), {
+  res.sendFile(path.join(publicFrontendPath, 'favicon.ico'), {
     headers: { 'Content-Type': 'image/x-icon' }
   });
 });
@@ -93,7 +93,6 @@ app.get('/*.html', (req, res, next) => {
     }
   });
 });
-
 
 // -------------------------
 // Start server
