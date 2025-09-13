@@ -83,9 +83,17 @@ app.get('/index.html', (req, res) => {
   res.sendFile(path.join(pagesPath, 'index.html'));
 });
 
-app.get('*.html', (req, res) => {
-  res.sendFile(path.join(pagesPath, 'login.html'));
+// Serve any other .html page if it exists in /pages
+app.get('/*.html', (req, res, next) => {
+  const requestedPage = path.join(pagesPath, req.path);
+  res.sendFile(requestedPage, (err) => {
+    if (err) {
+      // If page not found, fallback to login
+      res.sendFile(path.join(pagesPath, 'login.html'));
+    }
+  });
 });
+
 
 // -------------------------
 // Start server
