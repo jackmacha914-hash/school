@@ -19,3 +19,7 @@ services:
     region: oregon
     healthCheckPath: /api/health
     autoDeploy: true
+    routes:
+      - path: /api/*
+        headers:
+          Access-Control-Allow-Origin: null
