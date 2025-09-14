@@ -30,3 +30,16 @@ async function apiFetch(endpoint, options = {}) {
 }
 
 window.apiFetch = apiFetch;
+// 🟢 Intercept all fetch calls (even hardcoded ones)
+const originalFetch = window.fetch;
+window.fetch = (input, options = {}) => {
+    // If the request already starts with your domain, leave it
+    if (typeof input === "string" && input.startsWith("http")) {
+        // replace old hardcoded domain with the new one
+        input = input.replace("https://school-management-system-av07.onrender.com", API_CONFIG.API_BASE_URL);
+    } else if (typeof input === "string") {
+        // prepend base URL to relative paths
+        input = `${API_CONFIG.API_BASE_URL}${input}`;
+    }
+    return originalFetch(input, options);
+};
