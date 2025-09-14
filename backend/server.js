@@ -4,7 +4,7 @@ const path = require('path');
 require('dotenv').config();
 
 const connectDB = require('./config/db');
-const corsMiddleware = require('./middleware/cors');
+const cors = require('cors');
 
 const app = express();
 
@@ -14,9 +14,14 @@ const app = express();
 connectDB();
 
 // -------------------------
-// CORS – must be mounted first
+// Global CORS – allow frontend domain
 // -------------------------
-app.use(corsMiddleware);
+app.use(cors({
+  origin: "https://school-93dy.onrender.com", // frontend hosted domain
+  methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+  credentials: true
+}));
 
 // -------------------------
 // Body parsers
