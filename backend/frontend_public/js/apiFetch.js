@@ -43,3 +43,27 @@ window.fetch = (input, options = {}) => {
     }
     return originalFetch(input, options);
 };
+
+// 🟢 Intercept all fetch calls (even hardcoded ones)
+const originalFetch = window.fetch;
+window.fetch = (input, options = {}) => {
+    let originalInput = input;
+
+    if (typeof input === "string" && input.startsWith("http")) {
+        if (input.includes("school-management-system-av07.onrender.com")) {
+            console.warn(
+                "⚠️ Rewriting hardcoded API URL:",
+                input,
+                "➡️",
+                API_CONFIG.API_BASE_URL + input.split(".com")[1]
+            );
+            input = input.replace("https://school-management-system-av07.onrender.com", API_CONFIG.API_BASE_URL);
+        }
+    } else if (typeof input === "string") {
+        // prepend base URL to relative paths
+        input = `${API_CONFIG.API_BASE_URL}${input}`;
+    }
+
+    return originalFetch(input, options);
+};
+
