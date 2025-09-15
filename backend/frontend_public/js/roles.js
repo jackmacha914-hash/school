@@ -88,11 +88,7 @@ async function loadRolesWithFilters() {
 
     const token = localStorage.getItem('token');
     const filters = getRolesFilters();
-<<<<<<< HEAD
     let url = 'https://school-93dy.onrender.com/api/roles' + buildRolesQueryString(filters);
-=======
-    let url = 'https://school-management-system-av07.onrender.com/api/roles' + buildRolesQueryString(filters);
->>>>>>> 5ab2b09edcd458a602a095bcc9b9d483718a7b98
     try {
         const res = await fetch(url, { headers: { 'Authorization': `Bearer ${token}` } });
         
@@ -159,11 +155,7 @@ if (roleForm) {
         const permissions = document.getElementById('role-permissions').value.split(',').map(p => p.trim());
         const token = localStorage.getItem('token');
         try {
-<<<<<<< HEAD
             const res = await fetch('https://school-93dy.onrender.com/api/roles', {
-=======
-            const res = await fetch('https://school-management-system-av07.onrender.com/api/roles', {
->>>>>>> 5ab2b09edcd458a602a095bcc9b9d483718a7b98
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -184,101 +176,85 @@ if (roleForm) {
 }
 
 // --- Edit Role ---
-<<<<<<< HEAD
 if (roleTableBody) {
     roleTableBody.addEventListener('click', async (e) => {
-=======
-roleTableBody.addEventListener('click', async (e) => {
->>>>>>> 5ab2b09edcd458a602a095bcc9b9d483718a7b98
-    const btn = e.target;
-    const roleId = btn.getAttribute('data-id');
-    if (!roleId) return;
-    const token = localStorage.getItem('token');
-    // Edit Role (universal modal)
-    if (btn.classList.contains('edit-role-btn')) {
-        const li = btn.closest('tr');
-        const currentName = li.querySelector('td:nth-child(2)').textContent;
-        const currentPerms = li.querySelector('td:nth-child(3)').textContent;
-        universalEditForm.innerHTML = `
-            <input type="hidden" name="roleId" value="${roleId}" />
-            <div class='form-group'><label>Role Name:</label><input type='text' name='name' value='${currentName}' required /></div>
-            <div class='form-group'><label>Permissions (comma separated):</label><input type='text' name='permissions' value='${currentPerms}' required /></div>
-            <button type='submit'>Save Changes</button>
-        `;
-        universalEditMsg.style.display = 'none';
-        openUniversalModal(universalEditModal);
-        universalEditForm.onsubmit = async (ev) => {
-            ev.preventDefault();
+        const btn = e.target;
+        const roleId = btn.getAttribute('data-id');
+        if (!roleId) return;
+        const token = localStorage.getItem('token');
+        // Edit Role (universal modal)
+        if (btn.classList.contains('edit-role-btn')) {
+            const li = btn.closest('tr');
+            const currentName = li.querySelector('td:nth-child(2)').textContent;
+            const currentPerms = li.querySelector('td:nth-child(3)').textContent;
+            universalEditForm.innerHTML = `
+                <input type="hidden" name="roleId" value="${roleId}" />
+                <div class='form-group'><label>Role Name:</label><input type='text' name='name' value='${currentName}' required /></div>
+                <div class='form-group'><label>Permissions (comma separated):</label><input type='text' name='permissions' value='${currentPerms}' required /></div>
+                <button type='submit'>Save Changes</button>
+            `;
             universalEditMsg.style.display = 'none';
-            const formData = new FormData(universalEditForm);
-            const name = formData.get('name');
-            const permissions = formData.get('permissions').split(',').map(p => p.trim());
-            try {
-<<<<<<< HEAD
-                const res = await fetch(`https://school-93dy.onrender.com/api/roles/${roleId}`, {
-=======
-                const res = await fetch(`https://school-management-system-av07.onrender.com/api/roles/${roleId}`, {
->>>>>>> 5ab2b09edcd458a602a095bcc9b9d483718a7b98
-                    method: 'PUT',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${token}`,
-                    },
-                    body: JSON.stringify({ name, permissions })
-                });
-                if (res.ok) {
-                    universalEditMsg.textContent = 'Role updated successfully!';
-                    universalEditMsg.style.color = 'green';
-                    universalEditMsg.style.display = 'block';
-                    setTimeout(() => {
-                        closeUniversalModal(universalEditModal);
-                        loadRolesWithFilters();
-                    }, 1000);
-                } else {
-                    universalEditMsg.textContent = 'Failed to update role.';
+            openUniversalModal(universalEditModal);
+            universalEditForm.onsubmit = async (ev) => {
+                ev.preventDefault();
+                universalEditMsg.style.display = 'none';
+                const formData = new FormData(universalEditForm);
+                const name = formData.get('name');
+                const permissions = formData.get('permissions').split(',').map(p => p.trim());
+                try {
+                    const res = await fetch(`https://school-93dy.onrender.com/api/roles/${roleId}`, {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${token}`,
+                        },
+                        body: JSON.stringify({ name, permissions })
+                    });
+                    if (res.ok) {
+                        universalEditMsg.textContent = 'Role updated successfully!';
+                        universalEditMsg.style.color = 'green';
+                        universalEditMsg.style.display = 'block';
+                        setTimeout(() => {
+                            closeUniversalModal(universalEditModal);
+                            loadRolesWithFilters();
+                        }, 1000);
+                    } else {
+                        universalEditMsg.textContent = 'Failed to update role.';
+                        universalEditMsg.style.color = 'red';
+                        universalEditMsg.style.display = 'block';
+                    }
+                } catch (err) {
+                    universalEditMsg.textContent = 'Network error.';
                     universalEditMsg.style.color = 'red';
                     universalEditMsg.style.display = 'block';
                 }
-            } catch (err) {
-                universalEditMsg.textContent = 'Network error.';
-                universalEditMsg.style.color = 'red';
-                universalEditMsg.style.display = 'block';
-            }
-        };
-    }
-    // Delete Role (universal confirm modal)
-    else if (btn.classList.contains('delete-role-btn')) {
-        universalConfirmTitle.textContent = 'Delete Role';
-        universalConfirmMessage.textContent = 'Are you sure you want to delete this role?';
-        openUniversalModal(universalConfirmModal);
-        universalConfirmYes.onclick = async () => {
-            try {
-<<<<<<< HEAD
-                const res = await fetch(`https://school-93dy.onrender.com/api/roles/${roleId}`, {
-=======
-                const res = await fetch(`https://school-management-system-av07.onrender.com/api/roles/${roleId}`, {
->>>>>>> 5ab2b09edcd458a602a095bcc9b9d483718a7b98
-                    method: 'DELETE',
-                    headers: { 'Authorization': `Bearer ${token}` }
-                });
-                if (res.ok) {
-                    loadRolesWithFilters();
-                    closeUniversalModal(universalConfirmModal);
-                } else {
-                    alert('Failed to delete role');
+            };
+        }
+        // Delete Role (universal confirm modal)
+        else if (btn.classList.contains('delete-role-btn')) {
+            universalConfirmTitle.textContent = 'Delete Role';
+            universalConfirmMessage.textContent = 'Are you sure you want to delete this role?';
+            openUniversalModal(universalConfirmModal);
+            universalConfirmYes.onclick = async () => {
+                try {
+                    const res = await fetch(`https://school-93dy.onrender.com/api/roles/${roleId}`, {
+                        method: 'DELETE',
+                        headers: { 'Authorization': `Bearer ${token}` }
+                    });
+                    if (res.ok) {
+                        loadRolesWithFilters();
+                        closeUniversalModal(universalConfirmModal);
+                    } else {
+                        alert('Failed to delete role');
+                    }
+                } catch (err) {
+                    alert('Network error');
                 }
-            } catch (err) {
-                alert('Network error');
-            }
-        };
-        universalConfirmNo.onclick = () => closeUniversalModal(universalConfirmModal);
-    }
-<<<<<<< HEAD
+            };
+            universalConfirmNo.onclick = () => closeUniversalModal(universalConfirmModal);
+        }
     }); // Close the roleTableBody event listener
 }
-=======
-});
->>>>>>> 5ab2b09edcd458a602a095bcc9b9d483718a7b98
 
 // --- Bulk Delete Roles ---
 if (rolesBulkDelete) {
@@ -287,11 +263,7 @@ if (rolesBulkDelete) {
         if (!confirm('Are you sure you want to delete the selected roles?')) return;
         const token = localStorage.getItem('token');
         try {
-<<<<<<< HEAD
             const res = await fetch('https://school-93dy.onrender.com/api/roles', {
-=======
-            const res = await fetch('https://school-management-system-av07.onrender.com/api/roles', {
->>>>>>> 5ab2b09edcd458a602a095bcc9b9d483718a7b98
                 method: 'DELETE',
                 headers: {
                     'Content-Type': 'application/json',
@@ -316,11 +288,7 @@ if (rolesBulkExport) {
     rolesBulkExport.onclick = async function() {
         if (selectedRoleIds.size === 0) return;
         const token = localStorage.getItem('token');
-<<<<<<< HEAD
         let url = 'https://school-93dy.onrender.com/api/roles';
-=======
-        let url = 'https://school-management-system-av07.onrender.com/api/roles';
->>>>>>> 5ab2b09edcd458a602a095bcc9b9d483718a7b98
         const res = await fetch(url, { headers: { 'Authorization': `Bearer ${token}` } });
         const roles = await res.json();
         const selected = roles.filter(r => selectedRoleIds.has(r._id));

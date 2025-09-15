@@ -88,31 +88,23 @@ function editTeacher(index) {
 }
 
 // Add Teacher Form Handling
-<<<<<<< HEAD
 const addTeacherForm = document.getElementById('add-teacher-form');
 if (addTeacherForm) {
     addTeacherForm.addEventListener('submit', function(event) {
-=======
-document.getElementById('add-teacher-form').addEventListener('submit', function(event) {
->>>>>>> 5ab2b09edcd458a602a095bcc9b9d483718a7b98
-    event.preventDefault();
-    const name = document.getElementById('teacher-name').value;
-    const email = document.getElementById('teacher-email').value;
-    const subject = document.getElementById('teacher-subject').value;
+        event.preventDefault();
+        const name = document.getElementById('teacher-name').value;
+        const email = document.getElementById('teacher-email').value;
+        const subject = document.getElementById('teacher-subject').value;
 
-    if (name && email && subject) {
-        teachers.push({name, email, subject});
-        localStorage.setItem('teachers', JSON.stringify(teachers));
-        renderTeachersTable();
-    } else {
-        alert('All fields are required!');
-    }
-<<<<<<< HEAD
+        if (name && email && subject) {
+            teachers.push({name, email, subject});
+            localStorage.setItem('teachers', JSON.stringify(teachers));
+            renderTeachersTable();
+        } else {
+            alert('All fields are required!');
+        }
     }); // Close the addTeacherForm event listener
 }
-=======
-});
->>>>>>> 5ab2b09edcd458a602a095bcc9b9d483718a7b98
 
 // Search Teachers
 function searchTeachers() {

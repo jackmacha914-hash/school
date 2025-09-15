@@ -14,7 +14,7 @@ document.addEventListener("DOMContentLoaded", () => {
 <<<<<<< HEAD
             const res = await fetch("https://school-93dy.onrender.com/api/auth/signup", {
 =======
-            const res = await fetch("https://school-management-system-av07.onrender.com/api/auth/signup", {
+            const res = await fetch("https://school-93dy.onrender.com/api/auth/signup", {
 >>>>>>> 5ab2b09edcd458a602a095bcc9b9d483718a7b98
                 method: "POST",
                 headers: {
@@ -50,7 +50,7 @@ document.addEventListener("DOMContentLoaded", () => {
 <<<<<<< HEAD
             const res = await fetch("https://school-93dy.onrender.com/api/auth/signup", {
 =======
-            const res = await fetch("https://school-management-system-av07.onrender.com/api/auth/signup", {
+            const res = await fetch("https://school-93dy.onrender.com/api/auth/signup", {
 >>>>>>> 5ab2b09edcd458a602a095bcc9b9d483718a7b98
                 method: "POST",
                 headers: {
@@ -76,11 +76,7 @@ document.addEventListener("DOMContentLoaded", () => {
     // Fetch & render user lists (corrected)
     async function fetchAndRenderUsers() {
         try {
-<<<<<<< HEAD
             const res = await fetch("https://school-93dy.onrender.com/api/users", {
-=======
-            const res = await fetch("https://school-management-system-av07.onrender.com/api/users", {
->>>>>>> 5ab2b09edcd458a602a095bcc9b9d483718a7b98
                 headers: {
                     Authorization: `Bearer ${token}`
                 }

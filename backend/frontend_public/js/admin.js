@@ -1,9 +1,5 @@
-<<<<<<< HEAD
 (function() {
 // Admin User Management - Initialize DOM elements safely
-=======
-5// Admin User Management - Initialize DOM elements safely
->>>>>>> 5ab2b09edcd458a602a095bcc9b9d483718a7b98
 function getElementSafely(id, context = document) {
     const element = context.getElementById ? context.getElementById(id) : null;
     if (!element) {
@@ -178,8 +174,4 @@ if (document.readyState === 'loading') {
 } else {
     initializeAdminPage();
 }
-<<<<<<< HEAD
-
 })(); // Close the IIFE
-=======
->>>>>>> 5ab2b09edcd458a602a095bcc9b9d483718a7b98
