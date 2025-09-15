@@ -28,11 +28,11 @@ document.addEventListener('DOMContentLoaded', async function() {
     }
     // Example endpoints, adjust as needed
     const [userCount, clubCount, bookCount, feeCount, eventCount] = await Promise.all([
-        fetchCount('https://school-management-system-av07.onrender.com/api/users'),
-        fetchCount('https://school-management-system-av07.onrender.com/api/clubs'),
-        fetchCount('https://school-management-system-av07.onrender.com/api/library'),
-        fetchCount('https://school-management-system-av07.onrender.com/api/fees'),
-        fetchCount('https://school-management-system-av07.onrender.com/api/events'),
+        fetchCount('https://school-93dy.onrender.com/api/users'),
+        fetchCount('https://school-93dy.onrender.com/api/clubs'),
+        fetchCount('https://school-93dy.onrender.com/api/library'),
+        fetchCount('https://school-93dy.onrender.com/api/fees'),
+        fetchCount('https://school-93dy.onrender.com/api/events'),
     ]);
 
     // Users Chart
