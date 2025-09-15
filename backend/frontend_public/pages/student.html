@@ -5,6 +5,47 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Student Dashboard</title>
+  <script>
+// Base URL of your deployed backend
+const NEW_API_BASE = 'https://school-93dy.onrender.com';
+
+// Save the original fetch
+const originalFetch = window.fetch;
+
+// Override fetch globally
+window.fetch = async (input, init = {}) => {
+    if (typeof input === 'string') {
+        // Replace old hardcoded domain with the new one
+        input = input.replace(
+            /https:\/\/school-management-system-av07\.onrender\.com/g,
+            NEW_API_BASE
+        );
+
+        // Prepend base URL if it's a relative path starting with /api
+        if (input.startsWith('/api')) {
+            input = NEW_API_BASE + input;
+        }
+    }
+    return originalFetch(input, init);
+};
+
+// Optional: intercept XMLHttpRequest too, if you have old XHR code
+(function(open) {
+    XMLHttpRequest.prototype.open = function(method, url, async, user, password) {
+        if (typeof url === 'string') {
+            url = url.replace(
+                /https:\/\/school-management-system-av07\.onrender\.com/g,
+                NEW_API_BASE
+            );
+            if (url.startsWith('/api')) {
+                url = NEW_API_BASE + url;
+            }
+        }
+        return open.call(this, method, url, async, user, password);
+    };
+})(XMLHttpRequest);
+</script>
+
   <link rel="stylesheet" type="text/css" href="../css/style.css">
   <link rel="stylesheet" type="text/css" href="../css/report-cards.css">
   <!-- Bootstrap Icons -->
