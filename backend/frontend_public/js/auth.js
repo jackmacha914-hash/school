@@ -9,7 +9,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const password = loginForm.querySelector('#password').value;
 
             try {
-                const response = await fetch('https://school-management-system-av07.onrender.com/api/auth/login', {
+                const response = await fetch('https://school-93dy.onrender.com/api/auth/login', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
