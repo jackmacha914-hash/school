@@ -77,7 +77,7 @@ class AdminAttendanceManager {
                 end: endDate
             });
             
-            const url = `https://school-management-system-av07.onrender.com/api/attendance/history?${params.toString()}`;
+            const url = `https://school-93dy.onrender.com/api/attendance/history?${params.toString()}`;
             console.log('Fetching attendance data from:', url);
             
             const response = await fetch(url, {
