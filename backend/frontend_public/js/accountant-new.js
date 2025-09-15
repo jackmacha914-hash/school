@@ -111,7 +111,7 @@ async function handleClassChange(event) {
     try {
         // Try to fetch students from the API
         const token = localStorage.getItem('token');
-        const response = await fetch(`https://school-management-system-av07.onrender.com/api/students/class/${encodeURIComponent(className)}`, {
+        const response = await fetch(`https://school-93dy.onrender.com/api/students/class/${encodeURIComponent(className)}`, {
             headers: {
                 'Authorization': `Bearer ${token}`,
                 'Content-Type': 'application/json'
@@ -544,7 +544,7 @@ function initializeFeeForm() {
             console.log('Submitting form data:', formData);
             const token = localStorage.getItem('token');
             console.log('Sending request to server with data:', formData);
-            const response = await fetch('https://school-management-system-av07.onrender.com/api/fees', {
+            const response = await fetch('https://school-93dy.onrender.com/api/fees', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -723,7 +723,7 @@ async function loadFeeRecords() {
         }
 
         console.log('Fetching fee records from API...');
-        const response = await fetch('https://school-management-system-av07.onrender.com/api/fees', {
+        const response = await fetch('https://school-93dy.onrender.com/api/fees', {
             method: 'GET',
             headers: {
                 'Authorization': `Bearer ${token}`,
@@ -1056,7 +1056,7 @@ async function loadFeeRecords() {
         
         // Get the current URL and API endpoint for debugging
         const currentUrl = window.location.href;
-        const apiUrl = 'https://school-management-system-av07.onrender.com/api/fees';
+        const apiUrl = 'https://school-93dy.onrender.com/api/fees';
         const isLocalhost = false; // Local development check disabled for production
         
         // Create error details for debugging
@@ -1158,7 +1158,7 @@ function printReceipt(feeId, event) {
     console.log('Fetching fee details for ID:', feeId);
     
     // Fetch the fee details
-    fetch(`https://school-management-system-av07.onrender.com/api/fees/${feeId}`, {
+    fetch(`https://school-93dy.onrender.com/api/fees/${feeId}`, {
         method: 'GET',
         headers: {
             'Authorization': `Bearer ${token}`,
