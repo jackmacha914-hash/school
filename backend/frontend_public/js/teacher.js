@@ -34,7 +34,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const formData = new FormData(createHomeworkForm);
                 
                 // Prepare the request
-                const response = await fetch('https://school-management-system-av07.onrender.com/api/homeworks', {
+                const response = await fetch('https://school-93dy.onrender.com/api/homeworks', {
                     method: 'POST',
                     headers: {
                         'Authorization': `Bearer ${token}`
@@ -111,7 +111,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const formData = new FormData(createAssignmentForm);
                 
                 // Prepare the request
-                const response = await fetch('https://school-management-system-av07.onrender.com/api/assignments', {
+                const response = await fetch('https://school-93dy.onrender.com/api/assignments', {
                     method: 'POST',
                     headers: {
                         'Authorization': `Bearer ${token}`
@@ -185,7 +185,7 @@ document.addEventListener('DOMContentLoaded', () => {
         <p><strong>Due Date:</strong> ${new Date(homework.dueDate).toLocaleDateString()}</p>
         <p><strong>Class:</strong> ${homework.classAssigned}</p>
         <p><strong>Created By:</strong> ${homework.teacher?.name || 'N/A'}</p>
-        ${homework.file ? `<p><strong>File:</strong> <a href="${window.API_CONFIG?.BASE_URL || 'https://school-management-system-av07.onrender.com'}${homework.file}" target="_blank">Download</a></p>` : ''}
+        ${homework.file ? `<p><strong>File:</strong> <a href="${window.API_CONFIG?.BASE_URL || 'https://school-93dy.onrender.com'}${homework.file}" target="_blank">Download</a></p>` : ''}
         <div class="homework-actions">
           <button class="edit-homework-btn" onclick="editHomework('${homework._id}')">Edit</button>
           <button class="delete-homework-btn" onclick="deleteHomework('${homework._id}')">Delete</button>
@@ -235,7 +235,7 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
       }
 
-      const response = await fetch('https://school-management-system-av07.onrender.com/api/homeworks', {
+      const response = await fetch('https://school-93dy.onrender.com/api/homeworks', {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -291,7 +291,7 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
       }
 
-      const response = await fetch('https://school-management-system-av07.onrender.com/api/assignments', {
+      const response = await fetch('https://school-93dy.onrender.com/api/assignments', {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -405,7 +405,7 @@ document.addEventListener('DOMContentLoaded', () => {
       document.body.appendChild(loadingModal);
 
       try {
-        const response = await fetch(`https://school-management-system-av07.onrender.com/api/homeworks/${homeworkId}`, {
+        const response = await fetch(`https://school-93dy.onrender.com/api/homeworks/${homeworkId}`, {
           method: 'GET',
           headers: {
             'Authorization': `Bearer ${token}`,
@@ -737,7 +737,7 @@ document.addEventListener('DOMContentLoaded', () => {
       
       console.log('Submitting grade:', { homeworkId, submissionId, grade, comments });
       
-      const response = await fetch(`https://school-management-system-av07.onrender.com/api/homeworks/grade/${homeworkId}/${submissionId}`, {
+      const response = await fetch(`https://school-93dy.onrender.com/api/homeworks/grade/${homeworkId}/${submissionId}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -796,7 +796,7 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
       }
 
-      const response = await fetch(`https://school-management-system-av07.onrender.com/api/homeworks/${homeworkId}`, {
+      const response = await fetch(`https://school-93dy.onrender.com/api/homeworks/${homeworkId}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token}`
@@ -827,7 +827,7 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
       }
 
-      const response = await fetch(`https://school-management-system-av07.onrender.com/api/homeworks/${homeworkId}`, {
+      const response = await fetch(`https://school-93dy.onrender.com/api/homeworks/${homeworkId}`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -885,7 +885,7 @@ document.addEventListener('DOMContentLoaded', () => {
           const formData = new FormData(editForm);
           
           try {
-            const response = await fetch(`https://school-management-system-av07.onrender.com/api/homeworks/${homeworkId}`, {
+            const response = await fetch(`https://school-93dy.onrender.com/api/homeworks/${homeworkId}`, {
               method: 'PUT',
               headers: {
                 'Authorization': `Bearer ${token}`
@@ -1215,7 +1215,7 @@ document.addEventListener('DOMContentLoaded', () => {
         
         if (isEditMode && classId) {
           // Update existing class
-          response = await fetch(`https://school-management-system-av07.onrender.com/api/classes/${classId}`, {
+          response = await fetch(`https://school-93dy.onrender.com/api/classes/${classId}`, {
             method: 'PUT',
             headers: {
               'Content-Type': 'application/json',
@@ -1225,7 +1225,7 @@ document.addEventListener('DOMContentLoaded', () => {
           });
         } else {
           // Create new class
-          response = await fetch('https://school-management-system-av07.onrender.com/api/classes', {
+          response = await fetch('https://school-93dy.onrender.com/api/classes', {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
@@ -1270,7 +1270,7 @@ document.addEventListener('DOMContentLoaded', () => {
           throw new Error('No authentication token found');
         }
 
-        const response = await fetch('https://school-management-system-av07.onrender.com/api/classes', {
+        const response = await fetch('https://school-93dy.onrender.com/api/classes', {
           headers: {
             'Authorization': `Bearer ${token}`
           }
@@ -1355,7 +1355,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 throw new Error('No authentication token found');
               }
 
-              const response = await fetch(`https://school-management-system-av07.onrender.com/api/classes/${classId}`, {
+              const response = await fetch(`https://school-93dy.onrender.com/api/classes/${classId}`, {
                 method: 'DELETE',
                 headers: {
                   'Authorization': `Bearer ${token}`
@@ -1619,7 +1619,7 @@ document.addEventListener('DOMContentLoaded', () => {
       }
       
       // Use the correct backend URL (port 5000)
-      const baseUrl = 'https://school-management-system-av07.onrender.com';
+      const baseUrl = 'https://school-93dy.onrender.com';
       const apiUrl = `${baseUrl}/api/students/class/${encodeURIComponent(className)}`;
       
       console.log('Fetching students from:', apiUrl);
@@ -1816,7 +1816,7 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
       }
 
-      const baseUrl = 'https://school-management-system-av07.onrender.com';
+      const baseUrl = 'https://school-93dy.onrender.com';
       const response = await fetch(`${baseUrl}/api/attendance/history?class=${encodeURIComponent(selectedClass)}&start=${start}&end=${end}`, {
         method: 'GET',
         headers: {
@@ -2019,7 +2019,7 @@ document.addEventListener('DOMContentLoaded', () => {
       console.log('Saving attendance data:', attendanceData);
       
       // Send attendance data to the backend API
-      const baseUrl = 'https://school-management-system-av07.onrender.com';
+      const baseUrl = 'https://school-93dy.onrender.com';
       const response = await fetch(`${baseUrl}/api/attendance`, {
         method: 'POST',
         headers: {
@@ -2095,7 +2095,7 @@ async fetchAssignments() {
     if (!token) {
       throw new Error('No token found. Please log in again!');
     }
-    const response = await fetch('https://school-management-system-av07.onrender.com/api/assignments', {
+    const response = await fetch('https://school-93dy.onrender.com/api/assignments', {
       method: 'GET',
       headers: {
         'Authorization': `Bearer ${token}`,
@@ -2138,7 +2138,7 @@ async createAssignment() {
   try {
     const token = localStorage.getItem('token');
     if (!token) throw new Error('No token found. Please log in again!');
-    const response = await fetch('https://school-management-system-av07.onrender.com/api/assignments', {
+    const response = await fetch('https://school-93dy.onrender.com/api/assignments', {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${token}`
@@ -2179,7 +2179,7 @@ async createAssignment() {
       if (gradesTable) {
         // Fetch grades from backend and render
         const token = localStorage.getItem('token');
-        const API_BASE_URL = 'https://school-management-system-av07.onrender.com';
+        const API_BASE_URL = 'https://school-93dy.onrender.com';
         fetch(`${API_BASE_URL}/api/grades`, {
           method: 'GET',
           headers: {
@@ -2304,7 +2304,7 @@ async createAssignment() {
       `;
       tableBody.appendChild(row);
       this.updateGradeInStorage(studentName, subject, grade);
-      const API_BASE_URL = 'https://school-management-system-av07.onrender.com';
+      const API_BASE_URL = 'https://school-93dy.onrender.com';
       fetch(`${API_BASE_URL}/api/grades`, {
         method: 'POST',
         headers: {
@@ -2351,7 +2351,7 @@ initAnnouncementManagement() {
 postAnnouncement(text) {
   const token = localStorage.getItem('token');
 
-  fetch('https://school-management-system-av07.onrender.com/api/announcements', {
+  fetch('https://school-93dy.onrender.com/api/announcements', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -2382,7 +2382,7 @@ postAnnouncement(text) {
 fetchAnnouncements() {
   const token = localStorage.getItem('token');
 
-  fetch('https://school-management-system-av07.onrender.com/api/announcements', {
+  fetch('https://school-93dy.onrender.com/api/announcements', {
     method: 'GET',
     headers: {
       'Content-Type': 'application/json',
@@ -2482,7 +2482,7 @@ fetchAnnouncements() {
           throw new Error('No token found. Please log in again!');
         }
         
-        const response = await fetch('https://school-management-system-av07.onrender.com/api/announcements', {
+        const response = await fetch('https://school-93dy.onrender.com/api/announcements', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -2522,7 +2522,7 @@ fetchAnnouncements() {
           throw new Error('No token found. Please log in again!');
         }
         
-        const response = await fetch('https://school-management-system-av07.onrender.com/api/announcements', {
+        const response = await fetch('https://school-93dy.onrender.com/api/announcements', {
           headers: {
             'Authorization': `Bearer ${token}`
           }
@@ -2648,7 +2648,7 @@ fetchAnnouncements() {
           throw new Error('No token found. Please log in again!');
         }
         
-        const response = await fetch(`https://school-management-system-av07.onrender.com/api/announcements/${announcementId}`, {
+        const response = await fetch(`https://school-93dy.onrender.com/api/announcements/${announcementId}`, {
           method: 'DELETE',
           headers: {
             'Authorization': `Bearer ${token}`
@@ -2909,7 +2909,7 @@ fetchAnnouncements() {
         formData.append('reportCard', fileInput.files[0]);
         try {
           const token = localStorage.getItem('token');
-          const response = await fetch('https://school-management-system-av07.onrender.com/api/report-cards', {
+          const response = await fetch('https://school-93dy.onrender.com/api/report-cards', {
             method: 'POST',
             headers: token ? { 'Authorization': 'Bearer ' + token } : {},
             body: formData
@@ -2935,7 +2935,7 @@ fetchAnnouncements() {
         }
 
         // Get all students with their classes
-        const studentsResponse = await fetch('https://school-management-system-av07.onrender.com/api/students', {
+        const studentsResponse = await fetch('https://school-93dy.onrender.com/api/students', {
           headers: {
             'Authorization': `Bearer ${token}`,
             'Content-Type': 'application/json'
@@ -2960,7 +2960,7 @@ fetchAnnouncements() {
         for (const student of students) {
           for (const term of terms) {
             try {
-              const marksResponse = await fetch(`${window.API_CONFIG?.API_BASE_URL || 'https://school-management-system-av07.onrender.com'}/marks/student/${student._id}?term=${encodeURIComponent(term)}`, {
+              const marksResponse = await fetch(`${window.API_CONFIG?.API_BASE_URL || 'https://school-93dy.onrender.com'}/marks/student/${student._id}?term=${encodeURIComponent(term)}`, {
                 headers: {
                   'Authorization': `Bearer ${token}`,
                   'Content-Type': 'application/json'
@@ -3064,7 +3064,7 @@ fetchAnnouncements() {
     async loadStudentsForReportCardDropdown() {
       try {
         const token = localStorage.getItem('token');
-        const response = await fetch('https://school-management-system-av07.onrender.com/api/students', {
+        const response = await fetch('https://school-93dy.onrender.com/api/students', {
           headers: token ? { 'Authorization': 'Bearer ' + token } : {}
         });
         const students = await response.json();
@@ -3108,7 +3108,7 @@ function getGradeFromMarks(marks) {
 }
 
 // API configuration
-const API_BASE_URL = 'https://school-management-system-av07.onrender.com';
+const API_BASE_URL = 'https://school-93dy.onrender.com';
   
   function loadStudentsForGradeDropdown() {
     const studentSelect = document.getElementById('student-name');
@@ -3163,7 +3163,7 @@ const API_BASE_URL = 'https://school-management-system-av07.onrender.com';
         return;
       }
       
-      const response = await fetch('https://school-management-system-av07.onrender.com/api/grades', {
+      const response = await fetch('https://school-93dy.onrender.com/api/grades', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -3198,7 +3198,7 @@ const API_BASE_URL = 'https://school-management-system-av07.onrender.com';
         return;
       }
       
-      const response = await fetch('https://school-management-system-av07.onrender.com/api/grades', {
+      const response = await fetch('https://school-93dy.onrender.com/api/grades', {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -3479,7 +3479,7 @@ const API_BASE_URL = 'https://school-management-system-av07.onrender.com';
       
       try {
         // Send the report card to the backend for PDF generation and storage
-        const response = await fetch('https://school-management-system-av07.onrender.com/api/report-cards/generate', {
+        const response = await fetch('https://school-93dy.onrender.com/api/report-cards/generate', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -3531,7 +3531,7 @@ const API_BASE_URL = 'https://school-management-system-av07.onrender.com';
       const viewPdfBtn = document.createElement('button');
       viewPdfBtn.textContent = 'View Saved PDF';
       viewPdfBtn.className = 'btn btn-primary';
-      viewPdfBtn.onclick = () => window.open(`${window.API_CONFIG?.BASE_URL || 'https://school-management-system-av07.onrender.com'}${result.data.path}`, '_blank');
+      viewPdfBtn.onclick = () => window.open(`${window.API_CONFIG?.BASE_URL || 'https://school-93dy.onrender.com'}${result.data.path}`, '_blank');
       
       // Create download button
       const downloadBtn = document.createElement('button');
@@ -3539,7 +3539,7 @@ const API_BASE_URL = 'https://school-management-system-av07.onrender.com';
       downloadBtn.className = 'btn btn-outline-primary';
       downloadBtn.onclick = () => {
         const link = document.createElement('a');
-        link.href = `${window.API_CONFIG?.BASE_URL || 'https://school-management-system-av07.onrender.com'}${result.data.path}`;
+        link.href = `${window.API_CONFIG?.BASE_URL || 'https://school-93dy.onrender.com'}${result.data.path}`;
         link.download = `ReportCard_${studentName.replace(/\s+/g, '_')}_${term}_${year}.pdf`;
         document.body.appendChild(link);
         link.click();
@@ -3884,7 +3884,7 @@ const API_BASE_URL = 'https://school-management-system-av07.onrender.com';
       }
       
       // Fetch students from the API
-      const response = await fetch('https://school-management-system-av07.onrender.com/api/students', {
+      const response = await fetch('https://school-93dy.onrender.com/api/students', {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -4155,7 +4155,7 @@ const API_BASE_URL = 'https://school-management-system-av07.onrender.com';
       statusMessage.className = 'alert alert-info';
       
       // Send the report card to the backend for PDF generation
-      const response = await fetch('https://school-management-system-av07.onrender.com/api/report-cards', {
+      const response = await fetch('https://school-93dy.onrender.com/api/report-cards', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -4184,7 +4184,7 @@ const API_BASE_URL = 'https://school-management-system-av07.onrender.com';
       
       // Open the generated PDF in a new tab after a short delay
       setTimeout(() => {
-        const pdfUrl = `${window.API_CONFIG?.BASE_URL || 'https://school-management-system-av07.onrender.com'}${result.data.path}`;
+        const pdfUrl = `${window.API_CONFIG?.BASE_URL || 'https://school-93dy.onrender.com'}${result.data.path}`;
         window.open(pdfUrl, '_blank');
         
         // Add a direct download link as well
