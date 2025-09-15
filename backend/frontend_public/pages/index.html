@@ -5999,5 +5999,89 @@ window.fetch = async (input, init = {}) => {
     
     <!-- Load admin scripts -->
     <script src="js/admin.js"></script>
+                    <script>
+document.addEventListener('DOMContentLoaded', () => {
+
+  // ------------------------
+  // Ensure old inline fetches use new API URL
+  // ------------------------
+  if (window.API_CONFIG && API_CONFIG.API_BASE_URL) {
+    const originalFetch = window.fetch;
+    window.fetch = (input, options = {}) => {
+      if (typeof input === "string") {
+        if (input.includes("school-management-system-av07.onrender.com")) {
+          input = input.replace(
+            "https://school-management-system-av07.onrender.com",
+            API_CONFIG.API_BASE_URL
+          );
+        } else if (!input.startsWith("http")) {
+          input = `${API_CONFIG.API_BASE_URL}${input}`;
+        }
+      }
+      return originalFetch(input, options);
+    };
+  }
+
+  // ------------------------
+  // Safely load students
+  // ------------------------
+  async function loadStudents() {
+    const studentsList = document.getElementById('students-list');
+    if (!studentsList) {
+      console.warn('Student table body not found!');
+      return;
+    }
+
+    try {
+      const response = await fetch('/api/students');
+      const data = await response.json();
+
+      if (!data || !Array.isArray(data.students)) {
+        studentsList.innerHTML = '<p>No students found</p>';
+        return;
+      }
+
+      const html = data.students.map(student => {
+        const studentClass = student.class || student.classAssigned || (student.profile && student.profile.class) || 'Not assigned';
+        return `
+          <div class="student-item">
+            <h4>${student.name}</h4>
+            <p>Email: ${student.email}</p>
+            <p>Class: ${studentClass}</p>
+            <div class="action-buttons">
+              <button onclick="editStudent('${student._id}')">Edit</button>
+              <button onclick="deleteStudent('${student._id}')">Delete</button>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      studentsList.innerHTML = html;
+
+    } catch (error) {
+      console.error('Error loading students:', error);
+      if (studentsList) studentsList.innerHTML = '<p>Error loading students data</p>';
+    }
+  }
+
+  // Call student loader safely
+  loadStudents();
+
+  // ------------------------
+  // Wrap other inline scripts here safely
+  // Example:
+  const roleTableBody = document.getElementById('role-table-body');
+  if (roleTableBody) {
+    roleTableBody.addEventListener('click', (e) => {
+      console.log('Role table clicked', e.target);
+    });
+  }
+
+  // You can wrap any other inline JS that manipulates the DOM similarly
+  // Just make sure to check elements exist before using them
+
+});
+</script>
+
 </body>
 </html>
