@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Dashboard</title>
-    <script>
+   <script>
 // Base URL of your deployed backend
 const NEW_API_BASE = 'https://school-93dy.onrender.com';
 
@@ -14,37 +14,38 @@ const originalFetch = window.fetch;
 
 // Override fetch globally
 window.fetch = async (input, init = {}) => {
-    if (typeof input === 'string') {
-        // Replace old hardcoded domain with the new one
-        input = input.replace(
-            /https:\/\/school-management-system-av07\.onrender\.com/g,
-            NEW_API_BASE
-        );
+  if (typeof input === 'string') {
+    // Replace old hardcoded domain with the new one
+    input = input.replace(
+      /https:\/\/school-management-system-av07\.onrender\.com/g,
+      NEW_API_BASE
+    );
 
-        // Prepend base URL if it's a relative path starting with /api
-        if (input.startsWith('/api')) {
-            input = NEW_API_BASE + input;
-        }
+    // Prepend base URL if it's a relative path starting with /api
+    if (input.startsWith('/api')) {
+      input = NEW_API_BASE + input;
     }
-    return originalFetch(input, init);
+  }
+  return originalFetch(input, init);
 };
 
-// Optional: intercept XMLHttpRequest too, if you have old XHR code
+// Optional: intercept XMLHttpRequest too
 (function(open) {
-    XMLHttpRequest.prototype.open = function(method, url, async, user, password) {
-        if (typeof url === 'string') {
-            url = url.replace(
-                /https:\/\/school-management-system-av07\.onrender\.com/g,
-                NEW_API_BASE
-            );
-            if (url.startsWith('/api')) {
-                url = NEW_API_BASE + url;
-            }
-        }
-        return open.call(this, method, url, async, user, password);
-    };
+  XMLHttpRequest.prototype.open = function(method, url, async, user, password) {
+    if (typeof url === 'string') {
+      url = url.replace(
+        /https:\/\/school-management-system-av07\.onrender\.com/g,
+        NEW_API_BASE
+      );
+      if (url.startsWith('/api')) {
+        url = NEW_API_BASE + url;
+      }
+    }
+    return open.call(this, method, url, async, user, password);
+  };
 })(XMLHttpRequest);
 </script>
+
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="/css/style.css">
@@ -5999,28 +6000,8 @@ window.fetch = async (input, init = {}) => {
     
     <!-- Load admin scripts -->
     <script src="js/admin.js"></script>
-                    <script>
+  <script>
 document.addEventListener('DOMContentLoaded', () => {
-
-  // ------------------------
-  // Ensure old inline fetches use new API URL
-  // ------------------------
-  if (window.API_CONFIG && API_CONFIG.API_BASE_URL) {
-    const originalFetch = window.fetch;
-    window.fetch = (input, options = {}) => {
-      if (typeof input === "string") {
-        if (input.includes("school-management-system-av07.onrender.com")) {
-          input = input.replace(
-            "https://school-management-system-av07.onrender.com",
-            API_CONFIG.API_BASE_URL
-          );
-        } else if (!input.startsWith("http")) {
-          input = `${API_CONFIG.API_BASE_URL}${input}`;
-        }
-      }
-      return originalFetch(input, options);
-    };
-  }
 
   // ------------------------
   // Safely load students
@@ -6042,7 +6023,12 @@ document.addEventListener('DOMContentLoaded', () => {
       }
 
       const html = data.students.map(student => {
-        const studentClass = student.class || student.classAssigned || (student.profile && student.profile.class) || 'Not assigned';
+        const studentClass =
+          student.class ||
+          student.classAssigned ||
+          (student.profile && student.profile.class) ||
+          'Not assigned';
+
         return `
           <div class="student-item">
             <h4>${student.name}</h4>
@@ -6060,7 +6046,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     } catch (error) {
       console.error('Error loading students:', error);
-      if (studentsList) studentsList.innerHTML = '<p>Error loading students data</p>';
+      if (studentsList) {
+        studentsList.innerHTML = '<p>Error loading students data</p>';
+      }
     }
   }
 
@@ -6068,8 +6056,8 @@ document.addEventListener('DOMContentLoaded', () => {
   loadStudents();
 
   // ------------------------
-  // Wrap other inline scripts here safely
-  // Example:
+  // Other DOM event bindings
+  // ------------------------
   const roleTableBody = document.getElementById('role-table-body');
   if (roleTableBody) {
     roleTableBody.addEventListener('click', (e) => {
@@ -6077,11 +6065,9 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // You can wrap any other inline JS that manipulates the DOM similarly
-  // Just make sure to check elements exist before using them
-
 });
 </script>
+
 
 </body>
 </html>
