@@ -82,7 +82,11 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     // Base API URL - Make sure this matches your backend server port
+<<<<<<< HEAD
     const API_BASE_URL = 'https://school-93dy.onrender.com/api';
+=======
+    const API_BASE_URL = 'https://school-management-system-av07.onrender.com/api';
+>>>>>>> 5ab2b09edcd458a602a095bcc9b9d483718a7b98
     
     // Show notification function
     function showNotification(message, type = 'info') {
@@ -1120,7 +1124,11 @@ document.addEventListener('DOMContentLoaded', function() {
             }
 
             // Use the API_BASE_URL constant if available, otherwise default to port 5000
+<<<<<<< HEAD
             const API_BASE_URL = window.API_CONFIG?.API_BASE_URL || 'https://school-93dy.onrender.com';
+=======
+            const API_BASE_URL = window.API_CONFIG?.API_BASE_URL || 'https://school-management-system-av07.onrender.com';
+>>>>>>> 5ab2b09edcd458a602a095bcc9b9d483718a7b98
             console.log('Using API base URL:', API_BASE_URL);
             
             const headers = {

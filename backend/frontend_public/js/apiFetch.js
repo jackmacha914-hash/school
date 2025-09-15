@@ -45,10 +45,17 @@ if (!window._fetchOverridden) {
   window.fetch = function(input, options = {}) {
     if (typeof input === "string") {
       // Replace old domain
+<<<<<<< HEAD
       if (input.startsWith("https://school-93dy.onrender.com")) {
         console.warn("⚠️ Rewriting old API URL →", input);
         input = input.replace(
           "https://school-93dy.onrender.com",
+=======
+      if (input.startsWith("https://school-management-system-av07.onrender.com")) {
+        console.warn("⚠️ Rewriting old API URL →", input);
+        input = input.replace(
+          "https://school-management-system-av07.onrender.com",
+>>>>>>> 5ab2b09edcd458a602a095bcc9b9d483718a7b98
           API_CONFIG.API_BASE_URL
         );
       }

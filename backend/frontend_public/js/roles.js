@@ -88,7 +88,11 @@ async function loadRolesWithFilters() {
 
     const token = localStorage.getItem('token');
     const filters = getRolesFilters();
+<<<<<<< HEAD
     let url = 'https://school-93dy.onrender.com/api/roles' + buildRolesQueryString(filters);
+=======
+    let url = 'https://school-management-system-av07.onrender.com/api/roles' + buildRolesQueryString(filters);
+>>>>>>> 5ab2b09edcd458a602a095bcc9b9d483718a7b98
     try {
         const res = await fetch(url, { headers: { 'Authorization': `Bearer ${token}` } });
         
@@ -155,7 +159,11 @@ if (roleForm) {
         const permissions = document.getElementById('role-permissions').value.split(',').map(p => p.trim());
         const token = localStorage.getItem('token');
         try {
+<<<<<<< HEAD
             const res = await fetch('https://school-93dy.onrender.com/api/roles', {
+=======
+            const res = await fetch('https://school-management-system-av07.onrender.com/api/roles', {
+>>>>>>> 5ab2b09edcd458a602a095bcc9b9d483718a7b98
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -176,8 +184,12 @@ if (roleForm) {
 }
 
 // --- Edit Role ---
+<<<<<<< HEAD
 if (roleTableBody) {
     roleTableBody.addEventListener('click', async (e) => {
+=======
+roleTableBody.addEventListener('click', async (e) => {
+>>>>>>> 5ab2b09edcd458a602a095bcc9b9d483718a7b98
     const btn = e.target;
     const roleId = btn.getAttribute('data-id');
     if (!roleId) return;
@@ -202,7 +214,11 @@ if (roleTableBody) {
             const name = formData.get('name');
             const permissions = formData.get('permissions').split(',').map(p => p.trim());
             try {
+<<<<<<< HEAD
                 const res = await fetch(`https://school-93dy.onrender.com/api/roles/${roleId}`, {
+=======
+                const res = await fetch(`https://school-management-system-av07.onrender.com/api/roles/${roleId}`, {
+>>>>>>> 5ab2b09edcd458a602a095bcc9b9d483718a7b98
                     method: 'PUT',
                     headers: {
                         'Content-Type': 'application/json',
@@ -237,7 +253,11 @@ if (roleTableBody) {
         openUniversalModal(universalConfirmModal);
         universalConfirmYes.onclick = async () => {
             try {
+<<<<<<< HEAD
                 const res = await fetch(`https://school-93dy.onrender.com/api/roles/${roleId}`, {
+=======
+                const res = await fetch(`https://school-management-system-av07.onrender.com/api/roles/${roleId}`, {
+>>>>>>> 5ab2b09edcd458a602a095bcc9b9d483718a7b98
                     method: 'DELETE',
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
@@ -253,8 +273,12 @@ if (roleTableBody) {
         };
         universalConfirmNo.onclick = () => closeUniversalModal(universalConfirmModal);
     }
+<<<<<<< HEAD
     }); // Close the roleTableBody event listener
 }
+=======
+});
+>>>>>>> 5ab2b09edcd458a602a095bcc9b9d483718a7b98
 
 // --- Bulk Delete Roles ---
 if (rolesBulkDelete) {
@@ -263,7 +287,11 @@ if (rolesBulkDelete) {
         if (!confirm('Are you sure you want to delete the selected roles?')) return;
         const token = localStorage.getItem('token');
         try {
+<<<<<<< HEAD
             const res = await fetch('https://school-93dy.onrender.com/api/roles', {
+=======
+            const res = await fetch('https://school-management-system-av07.onrender.com/api/roles', {
+>>>>>>> 5ab2b09edcd458a602a095bcc9b9d483718a7b98
                 method: 'DELETE',
                 headers: {
                     'Content-Type': 'application/json',
@@ -288,7 +316,11 @@ if (rolesBulkExport) {
     rolesBulkExport.onclick = async function() {
         if (selectedRoleIds.size === 0) return;
         const token = localStorage.getItem('token');
+<<<<<<< HEAD
         let url = 'https://school-93dy.onrender.com/api/roles';
+=======
+        let url = 'https://school-management-system-av07.onrender.com/api/roles';
+>>>>>>> 5ab2b09edcd458a602a095bcc9b9d483718a7b98
         const res = await fetch(url, { headers: { 'Authorization': `Bearer ${token}` } });
         const roles = await res.json();
         const selected = roles.filter(r => selectedRoleIds.has(r._id));

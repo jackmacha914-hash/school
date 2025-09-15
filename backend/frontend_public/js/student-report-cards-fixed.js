@@ -67,7 +67,11 @@ class StudentReportCards {
             console.log('Fetching report cards for:', { studentId, term });
             
             // First, try to get the student's marks directly
+<<<<<<< HEAD
             const marksResponse = await fetch(`https://school-93dy.onrender.com/api/marks/student/${studentId}`, {
+=======
+            const marksResponse = await fetch(`https://school-management-system-av07.onrender.com/api/marks/student/${studentId}`, {
+>>>>>>> 5ab2b09edcd458a602a095bcc9b9d483718a7b98
                 headers: {
                     'Authorization': `Bearer ${localStorage.getItem('token')}`,
                     'Content-Type': 'application/json'

@@ -33,7 +33,11 @@ function buildLibraryQueryString(filters) {
 async function loadLibraryWithFilters() {
     const token = localStorage.getItem('token');
     const filters = getLibraryFilters();
+<<<<<<< HEAD
     let url = 'https://school-93dy.onrender.com/api/library' + buildLibraryQueryString(filters);
+=======
+    let url = 'https://school-management-system-av07.onrender.com/api/library' + buildLibraryQueryString(filters);
+>>>>>>> 5ab2b09edcd458a602a095bcc9b9d483718a7b98
     try {
         const res = await fetch(url, { headers: { 'Authorization': `Bearer ${token}` } });
         const books = await res.json();
@@ -109,7 +113,11 @@ async function loadLibraryWithFilters() {
                                 const status = formData.get('status') || 'available';
                                 const copies = parseInt(formData.get('copies')) || 1;
                                 try {
+<<<<<<< HEAD
                                     const res = await fetch(`https://school-93dy.onrender.com/api/library/${bookId}`, {
+=======
+                                    const res = await fetch(`https://school-management-system-av07.onrender.com/api/library/${bookId}`, {
+>>>>>>> 5ab2b09edcd458a602a095bcc9b9d483718a7b98
                                         method: 'PUT',
                                         headers: {
                                             'Content-Type': 'application/json',
@@ -221,7 +229,11 @@ async function loadLibraryWithFilters() {
                         
                         try {
                             const token = localStorage.getItem('token');
+<<<<<<< HEAD
                             const response = await fetch(`https://school-93dy.onrender.com/api/library/${bookId}/issue`, {
+=======
+                            const response = await fetch(`https://school-management-system-av07.onrender.com/api/library/${bookId}/issue`, {
+>>>>>>> 5ab2b09edcd458a602a095bcc9b9d483718a7b98
                                 method: 'POST',
                                 headers: {
                                     'Content-Type': 'application/json',
@@ -272,7 +284,11 @@ async function loadLibraryWithFilters() {
                         
                         try {
                             const token = localStorage.getItem('token');
+<<<<<<< HEAD
                             const response = await fetch(`https://school-93dy.onrender.com/api/library/${bookId}/issue`, {
+=======
+                            const response = await fetch(`https://school-management-system-av07.onrender.com/api/library/${bookId}/issue`, {
+>>>>>>> 5ab2b09edcd458a602a095bcc9b9d483718a7b98
                                 method: 'POST',
                                 headers: {
                                     'Content-Type': 'application/json',
@@ -341,7 +357,11 @@ async function loadLibraryWithFilters() {
                         universalConfirmYes.onclick = async () => {
                             if (universalConfirmModal) universalConfirmModal.style.display = 'none';
                             try {
+<<<<<<< HEAD
                                 const res = await fetch(`https://school-93dy.onrender.com/api/library/${bookId}`, {
+=======
+                                const res = await fetch(`https://school-management-system-av07.onrender.com/api/library/${bookId}`, {
+>>>>>>> 5ab2b09edcd458a602a095bcc9b9d483718a7b98
                                     method: 'DELETE',
                                     headers: { 'Authorization': `Bearer ${token}` }
                                 });
@@ -449,7 +469,11 @@ if (libraryForm) {
         
         console.log('Sending book data:', bookData);
         try {
+<<<<<<< HEAD
             const res = await fetch('https://school-93dy.onrender.com/api/library', {
+=======
+            const res = await fetch('https://school-management-system-av07.onrender.com/api/library', {
+>>>>>>> 5ab2b09edcd458a602a095bcc9b9d483718a7b98
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -524,7 +548,11 @@ if (libraryBulkDelete) {
                 const token = localStorage.getItem('token');
                 for (const bookId of selectedBookIds) {
                     try {
+<<<<<<< HEAD
                         await fetch(`https://school-93dy.onrender.com/api/library/${bookId}`, {
+=======
+                        await fetch(`https://school-management-system-av07.onrender.com/api/library/${bookId}`, {
+>>>>>>> 5ab2b09edcd458a602a095bcc9b9d483718a7b98
                             method: 'DELETE',
                             headers: { 'Authorization': `Bearer ${token}` }
                         });
@@ -545,7 +573,11 @@ if (libraryBulkExport) {
     libraryBulkExport.onclick = async function() {
         if (selectedBookIds.size === 0) return;
         const token = localStorage.getItem('token');
+<<<<<<< HEAD
         let url = 'https://school-93dy.onrender.com/api/library';
+=======
+        let url = 'https://school-management-system-av07.onrender.com/api/library';
+>>>>>>> 5ab2b09edcd458a602a095bcc9b9d483718a7b98
         const res = await fetch(url, { headers: { 'Authorization': `Bearer ${token}` } });
         const books = await res.json();
         const selected = books.filter(b => selectedBookIds.has(b._id));

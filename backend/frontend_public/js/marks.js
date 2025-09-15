@@ -1,5 +1,9 @@
 // API base URL
+<<<<<<< HEAD
 const API_BASE_URL = 'https://school-93dy.onrender.com';
+=======
+const API_BASE_URL = 'https://school-management-system-av07.onrender.com';
+>>>>>>> 5ab2b09edcd458a602a095bcc9b9d483718a7b98
 
 // Global variables
 let marksModal, classSelect, marksContainer, generateReportBtn, saveMarksBtn, cancelMarksBtn, openMarksModalBtn, closeModalBtn, reportCardPreview, printReportBtn, studentSelect;
@@ -241,7 +245,11 @@ document.addEventListener('DOMContentLoaded', async function() {
     testStudentSelection();
     
     // Import API configuration
+<<<<<<< HEAD
     const API_BASE_URL = 'https://school-93dy.onrender.com';
+=======
+    const API_BASE_URL = 'https://school-management-system-av07.onrender.com';
+>>>>>>> 5ab2b09edcd458a602a095bcc9b9d483718a7b98
     
     // Add event listener for the 'Add New Mark' button
     const openMarksModalBtn = document.getElementById('open-marks-modal');

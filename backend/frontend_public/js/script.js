@@ -88,9 +88,13 @@ function editTeacher(index) {
 }
 
 // Add Teacher Form Handling
+<<<<<<< HEAD
 const addTeacherForm = document.getElementById('add-teacher-form');
 if (addTeacherForm) {
     addTeacherForm.addEventListener('submit', function(event) {
+=======
+document.getElementById('add-teacher-form').addEventListener('submit', function(event) {
+>>>>>>> 5ab2b09edcd458a602a095bcc9b9d483718a7b98
     event.preventDefault();
     const name = document.getElementById('teacher-name').value;
     const email = document.getElementById('teacher-email').value;
@@ -103,8 +107,12 @@ if (addTeacherForm) {
     } else {
         alert('All fields are required!');
     }
+<<<<<<< HEAD
     }); // Close the addTeacherForm event listener
 }
+=======
+});
+>>>>>>> 5ab2b09edcd458a602a095bcc9b9d483718a7b98
 
 // Search Teachers
 function searchTeachers() {

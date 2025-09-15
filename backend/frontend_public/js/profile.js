@@ -101,7 +101,11 @@ async function fetchFreshProfile(token) {
     // Use the appropriate endpoint based on the user's role
     const profileEndpoint = `/api/students/profile`;
     
+<<<<<<< HEAD
     const response = await fetch(`${window.API_CONFIG?.API_BASE_URL || 'https://school-93dy.onrender.com'}${profileEndpoint}`, {
+=======
+    const response = await fetch(`${window.API_CONFIG?.API_BASE_URL || 'https://school-management-system-av07.onrender.com'}${profileEndpoint}`, {
+>>>>>>> 5ab2b09edcd458a602a095bcc9b9d483718a7b98
       method: "GET",
       headers: {
         "Authorization": `Bearer ${token}`,
@@ -176,7 +180,11 @@ function populateProfileForm(profile) {
       
       // Clean up any existing localhost URLs
       if (photoUrl && photoUrl.includes('localhost')) {
+<<<<<<< HEAD
         photoUrl = photoUrl.replace(/^http:\/\/localhost(:\d+)?/, window.API_CONFIG?.BASE_URL || 'https://school-93dy.onrender.com');
+=======
+        photoUrl = photoUrl.replace(/^http:\/\/localhost(:\d+)?/, window.API_CONFIG?.BASE_URL || 'https://school-management-system-av07.onrender.com');
+>>>>>>> 5ab2b09edcd458a602a095bcc9b9d483718a7b98
       }
       
       // Use our helper function to get the correct URL
@@ -310,7 +318,11 @@ async function updateProfile() {
   };
 
   try {
+<<<<<<< HEAD
     const response = await fetch("https://school-93dy.onrender.com/api/profile", {
+=======
+    const response = await fetch("https://school-management-system-av07.onrender.com/api/profile", {
+>>>>>>> 5ab2b09edcd458a602a095bcc9b9d483718a7b98
       method: "PUT",
       headers: {
         "Authorization": `Bearer ${token}`,
@@ -380,7 +392,11 @@ async function handlePhotoUpload(event) {
   formData.append('photo', file);
 
   try {
+<<<<<<< HEAD
     const response = await fetch('https://school-93dy.onrender.com/api/students/profile/photo', {
+=======
+    const response = await fetch('https://school-management-system-av07.onrender.com/api/students/profile/photo', {
+>>>>>>> 5ab2b09edcd458a602a095bcc9b9d483718a7b98
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${token}`
@@ -419,9 +435,15 @@ async function handlePhotoUpload(event) {
         if ((!photoUrl || photoUrl === '') && data.profile?.photo) {
           // If it's a relative path, prepend the base URL
           if (data.profile.photo.startsWith('/')) {
+<<<<<<< HEAD
             photoUrl = `${window.API_CONFIG?.BASE_URL || 'https://school-93dy.onrender.com'}${data.profile.photo}`;
           } else if (!data.profile.photo.startsWith('http')) {
             photoUrl = `${window.API_CONFIG?.BASE_URL || 'https://school-93dy.onrender.com'}/uploads/${data.profile.photo}`;
+=======
+            photoUrl = `${window.API_CONFIG?.BASE_URL || 'https://school-management-system-av07.onrender.com'}${data.profile.photo}`;
+          } else if (!data.profile.photo.startsWith('http')) {
+            photoUrl = `${window.API_CONFIG?.BASE_URL || 'https://school-management-system-av07.onrender.com'}/uploads/${data.profile.photo}`;
+>>>>>>> 5ab2b09edcd458a602a095bcc9b9d483718a7b98
           } else {
             photoUrl = data.profile.photo;
           }
@@ -497,7 +519,11 @@ async function changePassword() {
   }
 
   try {
+<<<<<<< HEAD
     const response = await fetch("https://school-93dy.onrender.com/api/profile/change-password", {
+=======
+    const response = await fetch("https://school-management-system-av07.onrender.com/api/profile/change-password", {
+>>>>>>> 5ab2b09edcd458a602a095bcc9b9d483718a7b98
       method: "POST",
       headers: {
         "Authorization": `Bearer ${token}`,

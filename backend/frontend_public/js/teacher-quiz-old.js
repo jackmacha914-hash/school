@@ -821,7 +821,11 @@ window.removeQuestion = function(button) {
         
         try {
             console.log('Sending quiz data:', quizData);
+<<<<<<< HEAD
             const response = await fetch('https://school-93dy.onrender.com/api/quizzes/create', {
+=======
+            const response = await fetch('https://school-management-system-av07.onrender.com/api/quizzes/create', {
+>>>>>>> 5ab2b09edcd458a602a095bcc9b9d483718a7b98
                 method: 'POST',
                 mode: 'cors',
                 credentials: 'same-origin',

@@ -33,7 +33,11 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Function to update user data from the server
     async function updateUserData() {
+<<<<<<< HEAD
         const API_BASE_URL = window.API_CONFIG?.API_BASE_URL || 'https://school-93dy.onrender.com';
+=======
+        const API_BASE_URL = window.API_CONFIG?.API_BASE_URL || 'https://school-management-system-av07.onrender.com';
+>>>>>>> 5ab2b09edcd458a602a095bcc9b9d483718a7b98
         const token = localStorage.getItem('token');
         
         if (!token) {
@@ -121,7 +125,11 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Function to load quizzes for teachers
     async function loadTeacherQuizzes() {
+<<<<<<< HEAD
         const API_BASE_URL = window.API_CONFIG?.API_BASE_URL || 'https://school-93dy.onrender.com';
+=======
+        const API_BASE_URL = window.API_CONFIG?.API_BASE_URL || 'https://school-management-system-av07.onrender.com';
+>>>>>>> 5ab2b09edcd458a602a095bcc9b9d483718a7b98
         const token = localStorage.getItem('token');
         
         const response = await fetch(`${API_BASE_URL}/api/quizzes/teacher`, {
@@ -141,7 +149,11 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Function to load quizzes for students
     async function loadStudentQuizzes(userClass) {
+<<<<<<< HEAD
         const API_BASE_URL = window.API_CONFIG?.API_BASE_URL || 'https://school-93dy.onrender.com';
+=======
+        const API_BASE_URL = window.API_CONFIG?.API_BASE_URL || 'https://school-management-system-av07.onrender.com';
+>>>>>>> 5ab2b09edcd458a602a095bcc9b9d483718a7b98
         const token = localStorage.getItem('token');
         
         try {

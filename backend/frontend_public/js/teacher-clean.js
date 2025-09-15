@@ -180,7 +180,11 @@ document.addEventListener('DOMContentLoaded', () => {
           throw new Error('No token found. Please log in again!');
         }
         
+<<<<<<< HEAD
         const response = await fetch('https://school-93dy.onrender.com/api/assignments', {
+=======
+        const response = await fetch('https://school-management-system-av07.onrender.com/api/assignments', {
+>>>>>>> 5ab2b09edcd458a602a095bcc9b9d483718a7b98
           method: 'GET',
           headers: {
             'Authorization': `Bearer ${token}`
@@ -322,7 +326,11 @@ document.addEventListener('DOMContentLoaded', () => {
           formData.append('file', fileInput.files[0]);
         }
         
+<<<<<<< HEAD
         const response = await fetch('https://school-93dy.onrender.com/api/assignments', {
+=======
+        const response = await fetch('https://school-management-system-av07.onrender.com/api/assignments', {
+>>>>>>> 5ab2b09edcd458a602a095bcc9b9d483718a7b98
           method: 'POST',
           headers: {
             'Authorization': `Bearer ${token}`
@@ -373,7 +381,11 @@ document.addEventListener('DOMContentLoaded', () => {
         const token = localStorage.getItem('token');
         if (!token) throw new Error('No token found. Please log in again!');
         
+<<<<<<< HEAD
         const response = await fetch(`https://school-93dy.onrender.com/api/assignments/${assignmentId}`, {
+=======
+        const response = await fetch(`https://school-management-system-av07.onrender.com/api/assignments/${assignmentId}`, {
+>>>>>>> 5ab2b09edcd458a602a095bcc9b9d483718a7b98
           method: 'DELETE',
           headers: {
             'Authorization': `Bearer ${token}`
@@ -497,7 +509,11 @@ function loadStudentsForGradeDropdown() {
   if (!studentSelect) return;
   
   const token = localStorage.getItem('token');
+<<<<<<< HEAD
   const API_BASE_URL = 'https://school-93dy.onrender.com';
+=======
+  const API_BASE_URL = 'https://school-management-system-av07.onrender.com';
+>>>>>>> 5ab2b09edcd458a602a095bcc9b9d483718a7b98
   
   fetch(`${API_BASE_URL}/api/students`, {
     method: 'GET',
