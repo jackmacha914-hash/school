@@ -1,10 +1,6 @@
-// API Configuration - use var to allow redefinition if needed
-if (typeof window.API_BASE_URL === 'undefined') {
-<<<<<<< HEAD
-  window.API_BASE_URL = 'https://school-93dy.onrender.com';
-=======
-  window.API_BASE_URL = 'https://school-management-system-av07.onrender.com';
->>>>>>> 5ab2b09edcd458a602a095bcc9b9d483718a7b98
+// API base URL - update this to your actual API URL
+if (typeof API_BASE_URL === 'undefined') {
+    window.API_BASE_URL = 'https://school-93dy.onrender.com';
 }
 
 // Initialize the resources page
