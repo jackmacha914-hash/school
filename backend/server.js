@@ -76,6 +76,19 @@ app.use('/api/stats', require('./routes/stats'));
 app.use('/api/users', require('./routes/schoolUserRoutes'));
 app.use('/api/contact', require('./routes/contact'));
 app.use('/api/health', require('./routes/health'));
+app.use('/api/health', require('./routes/class'));
+app.use('/api/health', require('./routes/attendanceRoutes'));
+app.use('/api/health', require('./routes/classRoutes'));
+app.use('/api/health', require('./routes/fees'));
+app.use('/api/health', require('./routes/gradesRoutes'));
+app.use('/api/health', require('./routes/homeworkRoutes'));
+app.use('/api/health', require('./routes/library'));
+app.use('/api/health', require('./routes/marksRoutes'));
+app.use('/api/health', require('./routes/quizRoutes'));
+app.use('/api/health', require('./routes/reportcardRoutes'));
+app.use('/api/health', require('./routes/studentRoutes'));
+app.use('/api/health', require('./routes/teacherRoutes'));
+
 
 // -------------------------
 // Frontend routes
