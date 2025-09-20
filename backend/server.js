@@ -75,19 +75,20 @@ app.use('/api/accounts', require('./routes/accounts'));
 app.use('/api/stats', require('./routes/stats'));
 app.use('/api/users', require('./routes/schoolUserRoutes'));
 app.use('/api/contact', require('./routes/contact'));
-app.use('/api/health', require('./routes/health'));
-app.use('/api/health', require('./routes/class'));
-app.use('/api/health', require('./routes/attendanceRoutes'));
-app.use('/api/health', require('./routes/classRoutes'));
-app.use('/api/health', require('./routes/fees'));
-app.use('/api/health', require('./routes/gradesRoutes'));
-app.use('/api/health', require('./routes/homeworkRoutes'));
-app.use('/api/health', require('./routes/library'));
-app.use('/api/health', require('./routes/marksRoutes'));
-app.use('/api/health', require('./routes/quizRoutes'));
-app.use('/api/health', require('./routes/reportCardRoutes'));
-app.use('/api/health', require('./routes/studentRoutes'));
-app.use('/api/health', require('./routes/teacherRoutes'));
+app.use('/api/students', require('./routes/studentRoutes'));
+app.use('/api/classes', require('./routes/classRoutes'));
+app.use('/api/homeworks', require('./routes/homeworkRoutes'));
+app.use('/api/reportcards', require('./routes/reportCardRoutes'));
+app.use('/api/teachers', require('./routes/teacherRoutes'));
+app.use('/api/attendance', require('./routes/attendanceRoutes'));
+app.use('/api/fees', require('./routes/fees'));
+app.use('/api/grades', require('./routes/gradesRoutes'));
+app.use('/api/library', require('./routes/library'));
+app.use('/api/marks', require('./routes/marksRoutes'));
+app.use('/api/quizzes', require('./routes/quizRoutes'));
+app.use('/api/classes-alt', require('./routes/class')); // if this is different
+app.use('/api/health', require('./routes/health')); // keep this for health checks
+
 
 
 // -------------------------
