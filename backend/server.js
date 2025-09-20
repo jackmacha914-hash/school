@@ -85,7 +85,7 @@ app.use('/api/fees', require('./routes/fees'));
 app.use('/api/grades', require('./routes/gradesRoutes'));
 app.use('/api/library', require('./routes/library'));
 app.use('/api/marks', require('./routes/marksRoutes'));
-app.use('/api/quizzes', require('./routes/quizRoutes'));
+app.use('/api/quizzes', require('./routes/quizRoutes.new'));
 app.use('/api/classes-alt', require('./routes/class')); // if this is different
 app.use('/api/health', require('./routes/health')); // keep this for health checks
 
