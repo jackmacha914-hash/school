@@ -37,11 +37,11 @@ class StudentManagement {
             
             // If no data in localStorage, try to load from API if available
             try {
-<<<<<<< HEAD
-                const apiUrl = window.API_CONFIG?.API_BASE_URL || 'https://school-93dy.onrender.com/api';
-=======
-                const apiUrl = window.API_CONFIG?.API_BASE_URL || 'https://school-management-system-av07.onrender.com/api';
->>>>>>> 5ab2b09edcd458a602a095bcc9b9d483718a7b98
+                // API base URL - update this to your actual API URL
+if (typeof API_BASE_URL === 'undefined') {
+    window.API_BASE_URL = 'https://school-93dy.onrender.com';
+}
+
                 const response = await fetch(`${apiUrl}/students`);
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
