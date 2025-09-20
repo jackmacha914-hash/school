@@ -207,11 +207,11 @@ async function loadLibraryWithFilters() {
                                 const status = formData.get('status') || 'available';
                                 const copies = parseInt(formData.get('copies')) || 1;
                                 try {
-<<<<<<< HEAD
-                                    const res = await fetch(`https://school-93dy.onrender.com/api/library/${bookId}`, {
-=======
-                                    const res = await fetch(`https://school-management-system-av07.onrender.com/api/library/${bookId}`, {
->>>>>>> 5ab2b09edcd458a602a095bcc9b9d483718a7b98
+                                       // API base URL - update this to your actual API URL
+if (typeof API_BASE_URL === 'undefined') {
+    window.API_BASE_URL = 'https://school-93dy.onrender.com';
+}
+
                                         method: 'PUT',
                                         headers: {
                                             'Content-Type': 'application/json',
