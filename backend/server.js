@@ -85,7 +85,7 @@ app.use('/api/health', require('./routes/homeworkRoutes'));
 app.use('/api/health', require('./routes/library'));
 app.use('/api/health', require('./routes/marksRoutes'));
 app.use('/api/health', require('./routes/quizRoutes'));
-app.use('/api/health', require('./routes/reportcardRoutes'));
+app.use('/api/health', require('./routes/reportCardRoutes'));
 app.use('/api/health', require('./routes/studentRoutes'));
 app.use('/api/health', require('./routes/teacherRoutes'));
 
