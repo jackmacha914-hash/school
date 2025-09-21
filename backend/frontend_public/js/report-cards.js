@@ -873,4 +873,8 @@ window.StudentReportCards = {
     updatePreview: updateReportCardPreview,
     delete: deleteReportCard
 };
+window.StudentReportCards = {
+  initialize: initializeTabSwitching,
+  preview: previewReportCard
+};
 
