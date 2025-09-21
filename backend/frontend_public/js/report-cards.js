@@ -448,7 +448,8 @@ async function previewReportCard(event) {
                 if (!token) throw new Error('Not authenticated');
                 
                 // First, try to get the report card which includes marks by term
-                const reportCardResponse = await fetch(`${API_BASE_URL}/api/marks/report-card/${studentId}`, {
+                const reportCardResponse = await fetch(
+                  `${API_BASE_URL}/api/marks/report-card/${studentId}?term=${encodeURIComponent(term)}&className=${encodeURIComponent(className)}`, {
                     headers: {
                         'Authorization': `Bearer ${token}`,
                         'Content-Type': 'application/json'
