@@ -865,3 +865,12 @@ document.addEventListener('DOMContentLoaded', function() {
     
     console.log('Report card system initialization complete');
 });
+// Backward compatibility for student.js
+window.StudentReportCards = {
+    loadClasses: loadClassesForReportCard,
+    loadStudents: loadStudentsForReportCard,
+    preview: previewReportCard,
+    updatePreview: updateReportCardPreview,
+    delete: deleteReportCard
+};
+
