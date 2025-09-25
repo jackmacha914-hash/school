@@ -982,7 +982,7 @@ if (typeof API_BASE_URL === 'undefined') {
             // Determine if we're creating or updating
             const isUpdate = quizId && quizId.value;
             const method = isUpdate ? 'PUT' : 'POST';
-            const url = isUpdate ? `${API_BASE_URL}/quizzes/${quizId.value}` : `${API_BASE_URL}/quizzes/create`;
+            const url = isUpdate ? `${API_BASE_URL}/quizzes/${quizId.value}` : `${API_BASE_URL}/api/quizzes/create`;
             
             let response;
             let data;
