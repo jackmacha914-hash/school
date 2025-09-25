@@ -203,10 +203,10 @@ if (typeof API_BASE_URL === 'undefined') {
             
             // Log the quiz ID being requested
             console.log('Fetching submissions for quiz ID:', quizId);
-            console.log('Request URL:', `${API_BASE_URL}/quizzes/submissions/quiz/${quizId}`);
+            console.log('Request URL:', `${API_BASE_URL}/api/quizzes/submissions/quiz/${quizId}`);
             
             // Fetch submissions from the server - using the correct endpoint
-            const response = await fetch(`${API_BASE_URL}/quizzes/submissions/quiz/${quizId}`, {
+            const response = await fetch(`${API_BASE_URL}/api/quizzes/submissions/quiz/${quizId}`, {
                 headers: {
                     'Authorization': `Bearer ${token}`,
                     'Content-Type': 'application/json'
@@ -414,7 +414,7 @@ if (typeof API_BASE_URL === 'undefined') {
             console.log('Fetching submission details for ID:', submissionId);
             
             // Fetch submission details
-            const response = await fetch(`${API_BASE_URL}/quizzes/submissions/${submissionId}`, {
+            const response = await fetch(`${API_BASE_URL}/api/quizzes/submissions/${submissionId}`, {
                 headers: {
                     'Authorization': `Bearer ${token}`,
                     'Content-Type': 'application/json'
