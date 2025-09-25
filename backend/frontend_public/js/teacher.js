@@ -1911,7 +1911,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         button.addEventListener('click', (e) => {
           e.preventDefault();
-          window.location.href = `/pages/attendance-details?id=${encodeURIComponent(id)}`;
+          window.location.href = `/pages/attendance-details.html?id=${encodeURIComponent(id)}`;
         });
 
         button.style.cursor = 'pointer';
@@ -1936,7 +1936,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
                  node.addEventListener('click', (e) => {
                 e.preventDefault();
-                window.location.href = `/pages/attendance-details?id=${encodeURIComponent(id)}`;
+                window.location.href = `/pages/attendance-details.html?id=${encodeURIComponent(id)}`;
               });             
 
               node.style.cursor = 'pointer';
