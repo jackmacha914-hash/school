@@ -584,3 +584,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // Make the class available globally
 window.StudentReportCards = StudentReportCards;
+// Backward compatibility wrapper
+function initializeTabSwitching() {
+    return new StudentReportCards();
+}
+
