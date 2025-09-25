@@ -1486,6 +1486,5 @@ function showQuestion(index) {
     initModal();
     
     // Debug functionality disabled in production
-        setTimeout(debugDOM, 1000);
-    }
+         setTimeout(debugDOM, 1000);
 });
