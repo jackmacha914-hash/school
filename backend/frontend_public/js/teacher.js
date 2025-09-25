@@ -1934,7 +1934,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
               }
 
-             
+                 node.addEventListener('click', (e) => {
+                e.preventDefault();
+                window.location.href = `/pages/attendance-details?id=${encodeURIComponent(id)}`;
+              });             
 
               node.style.cursor = 'pointer';
               node.addEventListener('mouseover', () => {
