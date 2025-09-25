@@ -31,6 +31,8 @@ const classRoutes = require('./routes/class');
 const marksRoutes = require('./routes/marksRoutes');
 const userRoutes = require('./routes/userRoutes');
 const feesRoutes = require('./routes/fees');
+const attendanceRoutes = require('./routes/attendanceRoutes');
+
 
 // ------------------- MIDDLEWARE -------------------
 const requestLogger = require('./middleware/requestLogger');
@@ -111,6 +113,8 @@ app.use('/api/quizzes', quizRoutes);
 app.use('/api/classes', classRoutes);
 app.use('/api/marks', marksRoutes);
 app.use('/api/fees', feesRoutes);
+app.use('/api/attendance', attendanceRoutes);
+
 
 // ------------------- MONGODB CONNECTION -------------------
 mongoose.connect(process.env.MONGODB_URI, {
