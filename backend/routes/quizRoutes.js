@@ -41,13 +41,13 @@ router.post('/create', protect, async (req, res) => {
     });
     
     try {
-        const { title, description, questions, timeLimit, passingScore, class: classId, subject } = req.body;
+        const { title, description, questions, timeLimit, passingScore, class: quizClass, subject } = req.body;
         
         console.log('Parsed request data:', {
             title,
             description,
             subject,
-            class: classId,
+            class: quizClass,
             timeLimit,
             passingScore,
             questionsLength: questions?.length,
@@ -677,7 +677,7 @@ router.get('/class/:classId', protect, async (req, res) => {
     try {
         const { classId } = req.params;
         const quizzes = await Quiz.find({ 
-            classId,
+            class: classId,
             isPublished: true 
         }).sort({ createdAt: -1 });
 
