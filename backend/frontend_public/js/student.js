@@ -420,7 +420,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 await fetchGrades();
             } else if (sectionId === 'report-cards-section') {
                 // Initialize report cards
-                const reportCards = initializeTabSwitching();  // from your report-card.js
+                const reportCards = new StudentReportCards();
                 reportCards.initialize();
             } else if (sectionId === 'fee-records-section') {
                 await fetchFeeRecords();
