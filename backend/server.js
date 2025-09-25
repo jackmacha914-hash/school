@@ -122,3 +122,9 @@ mongoose.connection.once('open', () => {
     console.log(`🚀 Server running on port ${PORT}`);
   });
 });
+
+// -------------------------
+// Serve uploaded resources
+// -------------------------
+const uploadsPath = path.join(__dirname, 'uploads');
+app.use('/uploads', express.static(uploadsPath));
