@@ -1861,214 +1861,218 @@ document.addEventListener('DOMContentLoaded', () => {
       // Sort records by date in descending order
       attendanceStats.sort((a, b) => new Date(b.date) - new Date(a.date));
 
-      // Render the records table
-      recordsList.innerHTML = attendanceStats.map(record => `
-        <tr>
-          <td>${record.date}</td>
-          <td>${record.class}</td>
-          <td>${record.present}</td>
-          <td>${record.absent}</td>
-          <td>${record.total}</td>
-          <td>
-            <button class="btn btn-sm btn-info attendance-details-btn" 
-                    data-id="${record._id.toString()}">
-              <i class="fas fa-eye"></i> View Details
-            </button>
-          </td>
-        </tr>
-      `).join('');
+    // Helper function to build the correct details URL
+function getDetailsPageUrl(id) {
+  const needsHtml = !window.location.hostname.includes('localhost');
+  const fileName = needsHtml ? 'attendance-details.html' : 'attendance-details';
+  return `/pages/${fileName}?id=${encodeURIComponent(id)}`;
+}
 
-      // Add click handlers after rendering
-      document.querySelectorAll('.attendance-details-btn').forEach(btn => {
-        btn.addEventListener('click', (e) => {
-          const id = e.currentTarget.getAttribute('data-id');
-          console.log('Button clicked with ID:', id);
-          if (id) {
-            // Force the URL to include .html and the ID parameter
-            const baseUrl = window.location.origin + '/pages/attendance-details.html';
-            const fullUrl = `${baseUrl}?id=${encodeURIComponent(id)}`;
-            console.log('Navigating to:', fullUrl);
-            window.location.href = fullUrl;
-          } else {
-            console.error('No ID found on button');
-          }
-        });
-      });
+// Render the records table
+recordsList.innerHTML = attendanceStats.map(record => `
+  <tr>
+    <td>${record.date}</td>
+    <td>${record.class}</td>
+    <td>${record.present}</td>
+    <td>${record.absent}</td>
+    <td>${record.total}</td>
+    <td>
+      <button class="btn btn-sm btn-info attendance-details-btn" 
+              data-id="${record._id.toString()}">
+        <i class="fas fa-eye"></i> View Details
+      </button>
+    </td>
+  </tr>
+`).join('');
 
-      // Add click handler for details buttons
-      const detailsButtons = document.querySelectorAll('.attendance-details-btn');
-      if (detailsButtons.length === 0) {
-        console.error('No details buttons found');
-        return;
-      }
+// Add click handlers after rendering
+document.querySelectorAll('.attendance-details-btn').forEach(btn => {
+  btn.addEventListener('click', (e) => {
+    const id = e.currentTarget.getAttribute('data-id');
+    console.log('Button clicked with ID:', id);
+    if (id) {
+      const fullUrl = getDetailsPageUrl(id);
+      console.log('Navigating to:', fullUrl);
+      window.location.href = fullUrl;
+    } else {
+      console.error('No ID found on button');
+    }
+  });
+});
 
-      detailsButtons.forEach(button => {
-        const id = button.dataset.id;
+// Add click handler for details buttons
+const detailsButtons = document.querySelectorAll('.attendance-details-btn');
+if (detailsButtons.length === 0) {
+  console.error('No details buttons found');
+  return;
+}
+
+detailsButtons.forEach(button => {
+  const id = button.dataset.id;
+  if (!id) {
+    console.error('Button missing ID');
+    return;
+  }
+
+  button.addEventListener('click', (e) => {
+    e.preventDefault();
+    window.location.href = getDetailsPageUrl(id);
+  });
+
+  button.style.cursor = 'pointer';
+  button.addEventListener('mouseover', () => {
+    button.style.opacity = '0.9';
+  });
+  button.addEventListener('mouseout', () => {
+    button.style.opacity = '1';
+  });
+});
+
+// Add MutationObserver to handle dynamically added buttons
+const observer = new MutationObserver((mutations) => {
+  mutations.forEach(mutation => {
+    mutation.addedNodes.forEach(node => {
+      if (node.nodeType === 1 && node.classList.contains('attendance-details-btn')) {
+        const id = node.dataset.id;
         if (!id) {
-          console.error('Button missing ID');
+          console.error('Dynamically added button missing ID');
           return;
         }
 
-        button.addEventListener('click', (e) => {
+        node.addEventListener('click', (e) => {
           e.preventDefault();
-          window.location.href = `/pages/attendance-details.html?id=${encodeURIComponent(id)}`;
+          window.location.href = getDetailsPageUrl(id);
         });
 
-        button.style.cursor = 'pointer';
-        button.addEventListener('mouseover', () => {
-          button.style.opacity = '0.9';
+        node.style.cursor = 'pointer';
+        node.addEventListener('mouseover', () => {
+          node.style.opacity = '0.9';
         });
-        button.addEventListener('mouseout', () => {
-          button.style.opacity = '1';
+        node.addEventListener('mouseout', () => {
+          node.style.opacity = '1';
         });
-      });
-
-      // Add MutationObserver to handle dynamically added buttons
-      const observer = new MutationObserver((mutations) => {
-        mutations.forEach(mutation => {
-          mutation.addedNodes.forEach(node => {
-            if (node.nodeType === 1 && node.classList.contains('attendance-details-btn')) {
-              const id = node.dataset.id;
-              if (!id) {
-                console.error('Dynamically added button missing ID');
-                return;
-              }
-
-                 node.addEventListener('click', (e) => {
-                e.preventDefault();
-                window.location.href = `/pages/attendance-details.html?id=${encodeURIComponent(id)}`;
-              });             
-
-              node.style.cursor = 'pointer';
-              node.addEventListener('mouseover', () => {
-                node.style.opacity = '0.9';
-              });
-              node.addEventListener('mouseout', () => {
-                node.style.opacity = '1';
-              });
-            }
-          });
-        });
-      });
-
-      // Start observing the table body
-      const tableBody = document.querySelector('#past-attendance-records');
-      if (tableBody) {
-        observer.observe(tableBody, { childList: true, subtree: true });
-      } else {
-        console.error('Table body not found');
       }
+    });
+  });
+});
 
-      // Show the records list
-      const pastAttendanceList = document.getElementById('past-attendance-list');
-      if (pastAttendanceList) {
-        pastAttendanceList.style.display = 'block';
-      }
+// Start observing the table body
+const tableBody = document.querySelector('#past-attendance-records');
+if (tableBody) {
+  observer.observe(tableBody, { childList: true, subtree: true });
+} else {
+  console.error('Table body not found');
+}
 
-      if (attendanceStats.length === 0) {
-        this.showMessage('No attendance records found for the selected period', 'info');
-      }
+// Show the records list
+const pastAttendanceList = document.getElementById('past-attendance-list');
+if (pastAttendanceList) {
+  pastAttendanceList.style.display = 'block';
+}
 
-    } catch (error) {
-      console.error('Error fetching past attendance:', error);
-      this.showMessage('Failed to fetch attendance records: ' + (error.message || 'Please try again'), 'error');
-    }
+if (attendanceStats.length === 0) {
+  this.showMessage('No attendance records found for the selected period', 'info');
+}
+
+} catch (error) {
+  console.error('Error fetching past attendance:', error);
+  this.showMessage('Failed to fetch attendance records: ' + (error.message || 'Please try again'), 'error');
+}
+}
+
+// Save attendance to the server
+async saveAttendance() {
+  if (!this.currentClass) {
+    this.showMessage('Please select a class first', 'error');
+    return;
   }
-  
-  // Save attendance to the server
-  async saveAttendance() {
-    if (!this.currentClass) {
-      this.showMessage('Please select a class first', 'error');
+
+  const dateInput = document.getElementById('attendance-date');
+  if (!dateInput || !dateInput.value) {
+    this.showMessage('Please select a date', 'error');
+    return;
+  }
+
+  const date = dateInput.value;
+
+  try {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      window.location.href = 'login.html';
       return;
     }
-    
-    const dateInput = document.getElementById('attendance-date');
-    if (!dateInput || !dateInput.value) {
-      this.showMessage('Please select a date', 'error');
-      return;
+
+    // Show loading state
+    const saveBtn = document.getElementById('save-attendance-btn');
+    const originalBtnText = saveBtn ? saveBtn.innerHTML : 'Save';
+    if (saveBtn) {
+      saveBtn.disabled = true;
+      saveBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span> Saving...';
     }
-    
-    const date = dateInput.value;
-    
-    try {
-      const token = localStorage.getItem('token');
-      if (!token) {
-        window.location.href = 'login.html';
-        return;
+
+    // Prepare attendance data
+    const attendanceData = {
+      class: this.currentClass,
+      date: date,
+      records: Array.from(this.attendanceRecords.entries()).map(([studentId, record]) => ({
+        studentId,
+        status: record.status,
+        remarks: record.remarks || ''
+      }))
+    };
+
+    console.log('Saving attendance data:', attendanceData);
+
+    // Send attendance data to the backend API
+    const baseUrl = 'https://school-93dy.onrender.com';
+    const response = await fetch(`${baseUrl}/api/attendance`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
+        'Accept': 'application/json'
+      },
+      credentials: 'include',
+      body: JSON.stringify(attendanceData)
+    });
+
+    // Restore button state
+    if (saveBtn) {
+      saveBtn.disabled = false;
+      saveBtn.innerHTML = originalBtnText;
+    }
+
+    if (!response.ok) {
+      let errorMessage = `HTTP error! status: ${response.status}`;
+      try {
+        const errorData = await response.json();
+        errorMessage = errorData.message || errorMessage;
+      } catch (e) {
+        errorMessage = response.statusText || errorMessage;
       }
-      
-      // Show loading state
-      const saveBtn = document.getElementById('save-attendance-btn');
-      const originalBtnText = saveBtn ? saveBtn.innerHTML : 'Save';
-      if (saveBtn) {
-        saveBtn.disabled = true;
-        saveBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span> Saving...';
-      }
-      
-      // Prepare attendance data
-      const attendanceData = {
-        class: this.currentClass,
-        date: date,
-        records: Array.from(this.attendanceRecords.entries()).map(([studentId, record]) => ({
-          studentId,
-          status: record.status,
-          remarks: record.remarks || ''
-        }))
-      };
-      
-      console.log('Saving attendance data:', attendanceData);
-      
-      // Send attendance data to the backend API
-      const baseUrl = 'https://school-93dy.onrender.com';
-      const response = await fetch(`${baseUrl}/api/attendance`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
-          'Accept': 'application/json'
-        },
-        credentials: 'include',
-        body: JSON.stringify(attendanceData)
-      });
-      
-      // Restore button state
-      if (saveBtn) {
-        saveBtn.disabled = false;
-        saveBtn.innerHTML = originalBtnText;
-      }
-      
-      if (!response.ok) {
-        let errorMessage = `HTTP error! status: ${response.status}`;
-        try {
-          const errorData = await response.json();
-          errorMessage = errorData.message || errorMessage;
-        } catch (e) {
-          // If we can't parse the error as JSON, use the status text
-          errorMessage = response.statusText || errorMessage;
-        }
-        throw new Error(errorMessage);
-      }
-      
-      const result = await response.json();
-      console.log('Attendance saved successfully:', result);
-      
-      this.showMessage('Attendance saved successfully!', 'success');
-      
-      // Refresh the attendance data to show the saved state
-      await this.onClassSelected(this.currentClass);
-      
-    } catch (error) {
-      console.error('Error saving attendance:', error);
-      this.showMessage('Failed to save attendance: ' + (error.message || 'Please try again'), 'error');
-      
-      // Restore button state in case of error
-      const saveBtn = document.getElementById('save-attendance-btn');
-      if (saveBtn) {
-        saveBtn.disabled = false;
-        saveBtn.innerHTML = 'Save Attendance';
-      }
+      throw new Error(errorMessage);
+    }
+
+    const result = await response.json();
+    console.log('Attendance saved successfully:', result);
+
+    this.showMessage('Attendance saved successfully!', 'success');
+
+    // Refresh the attendance data to show the saved state
+    await this.onClassSelected(this.currentClass);
+
+  } catch (error) {
+    console.error('Error saving attendance:', error);
+    this.showMessage('Failed to save attendance: ' + (error.message || 'Please try again'), 'error');
+
+    // Restore button state in case of error
+    const saveBtn = document.getElementById('save-attendance-btn');
+    if (saveBtn) {
+      saveBtn.disabled = false;
+      saveBtn.innerHTML = 'Save Attendance';
     }
   }
+}
 
   /* ------------------
    ASSIGNMENTS MANAGEMENT
