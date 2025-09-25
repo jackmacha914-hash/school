@@ -119,7 +119,7 @@ router.post('/create', protect, async (req, res) => {
             questions: questions.length,
             timeLimit,
             passingScore,
-            class: classId,
+            class: req.body.class,
             teacherId: req.user.id
         });
 
