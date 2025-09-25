@@ -41,12 +41,13 @@ app.use((req, res, next) => {
   });
   next();
 });
-
 // -------------------------
-// Serve uploaded resources
+// Serve uploaded files (resources, homeworks, etc.)
 // -------------------------
 const uploadsPath = path.join(__dirname, 'uploads');
 app.use('/uploads', express.static(uploadsPath));
+
+// -------------------------
 
 // -------------------------
 // Static assets (frontend)
