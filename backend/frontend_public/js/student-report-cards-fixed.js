@@ -70,8 +70,7 @@ class StudentReportCards {
             // API base URL - update this to your actual API URL
 if (typeof API_BASE_URL === 'undefined') {
     window.API_BASE_URL = 'https://school-93dy.onrender.com';
-}
-
+    const marksResponse = await fetch(`${API_BASE_URL}/api/marks/student/${studentId}`, {
                 headers: {
                     'Authorization': `Bearer ${localStorage.getItem('token')}`,
                     'Content-Type': 'application/json'
