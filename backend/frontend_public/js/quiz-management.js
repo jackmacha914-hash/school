@@ -152,296 +152,290 @@ if (typeof API_BASE_URL === 'undefined') {
         });
     }
 
-    // Function to view submissions for a quiz
-    async function viewSubmissions(quizId) {
-        // Show loading state
-        const loadingHtml = `
+ // Function to view submissions for a quiz
+async function viewSubmissions(quizId) {
+    // Show loading state
+    const loadingHtml = `
+        <div class="modal-header">
+            <h5 class="modal-title">Quiz Submissions</h5>
+            <button type="button" class="close" data-dismiss="modal">&times;</button>
+        </div>
+        <div class="modal-body text-center py-4">
+            <div class="spinner-border text-primary" role="status">
+                <span class="sr-only">Loading...</span>
+            </div>
+            <p class="mt-2">Loading submissions...</p>
+        </div>
+    `;
+    
+    // Create or update modal
+    let modal = document.getElementById('submissionsModal');
+    if (!modal) {
+        modal = document.createElement('div');
+        modal.id = 'submissionsModal';
+        modal.className = 'modal fade';
+        modal.tabIndex = '-1';
+        modal.role = 'dialog';
+        modal.innerHTML = `
+            <div class="modal-dialog modal-lg" role="document">
+                <div class="modal-content">
+                    ${loadingHtml}
+                </div>
+            </div>
+        `;
+        document.body.appendChild(modal);
+    } else {
+        modal.querySelector('.modal-content').innerHTML = loadingHtml;
+    }
+    
+    // Show modal with vanilla JS
+    const modalInstance = new bootstrap.Modal(modal);
+    modalInstance.show();
+    
+    try {
+        // Get token from localStorage
+        const token = localStorage.getItem('token');
+        console.log('Token from localStorage:', token ? 'Token exists' : 'No token found');
+        
+        if (!token) {
+            throw new Error('No authentication token found. Please log in again.');
+        }
+        
+        // Log the quiz ID being requested
+        console.log('Fetching submissions for quiz ID:', quizId);
+        console.log('Request URL:', `${API_BASE_URL}/api/quizzes/submissions/quiz/${quizId}`);
+        
+        // Fetch submissions from the server - updated endpoint
+        const response = await fetch(`${API_BASE_URL}/api/quizzes/submissions/quiz/${quizId}`, {
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            },
+            credentials: 'include' // Ensure cookies are sent with the request
+        });
+        
+        console.log('Response status:', response.status);
+        console.log('Response headers:', Object.fromEntries(response.headers.entries()));
+        
+        if (response.status === 401) {
+            console.error('Authentication error - token might be expired or invalid');
+            window.location.href = '/login.html';
+            return;
+        }
+        
+        if (!response.ok) {
+            const errorData = await response.json().catch(() => ({}));
+            console.error('Error response:', errorData);
+            throw new Error(errorData.message || 'Failed to fetch submissions');
+        }
+        
+        const responseText = await response.text();
+        console.log('Raw response text:', responseText);
+        
+        let data;
+        try {
+            data = JSON.parse(responseText);
+            console.log('Parsed response data:', data);
+        } catch (e) {
+            console.error('Error parsing response as JSON:', e);
+            throw new Error('Invalid response from server');
+        }
+        
+        console.log('Submissions data from API:', data);
+        
+        const submissions = Array.isArray(data.data) ? data.data : [];
+        console.log('Number of submissions found:', submissions.length);
+        console.log('Processed submissions:', submissions);
+        
+        submissions.forEach((sub, index) => {
+            console.log(`Submission ${index}:`, {
+                studentName: sub.studentName,
+                studentEmail: sub.studentEmail,
+                _id: sub._id,
+                sub: JSON.stringify(sub, null, 2)
+            });
+        });
+        
+        const submissionsHtml = `
             <div class="modal-header">
                 <h5 class="modal-title">Quiz Submissions</h5>
                 <button type="button" class="close" data-dismiss="modal">&times;</button>
             </div>
-            <div class="modal-body text-center py-4">
-                <div class="spinner-border text-primary" role="status">
-                    <span class="sr-only">Loading...</span>
-                </div>
-                <p class="mt-2">Loading submissions...</p>
-            </div>
-        `;
-        
-        // Create or update modal
-        let modal = document.getElementById('submissionsModal');
-        if (!modal) {
-            modal = document.createElement('div');
-            modal.id = 'submissionsModal';
-            modal.className = 'modal fade';
-            modal.tabIndex = '-1';
-            modal.role = 'dialog';
-            modal.innerHTML = `
-                <div class="modal-dialog modal-lg" role="document">
-                    <div class="modal-content">
-                        ${loadingHtml}
-                    </div>
-                </div>
-            `;
-            document.body.appendChild(modal);
-        } else {
-            modal.querySelector('.modal-content').innerHTML = loadingHtml;
-        }
-        
-        // Show modal with vanilla JS
-        const modalInstance = new bootstrap.Modal(modal);
-        modalInstance.show();
-        
-        try {
-            // Get token from localStorage
-            const token = localStorage.getItem('token');
-            console.log('Token from localStorage:', token ? 'Token exists' : 'No token found');
-            
-            if (!token) {
-                throw new Error('No authentication token found. Please log in again.');
-            }
-            
-            // Log the quiz ID being requested
-            console.log('Fetching submissions for quiz ID:', quizId);
-            console.log('Request URL:', `${API_BASE_URL}/quizzes/submissions/quiz/${quizId}`);
-            
-            // Fetch submissions from the server - using the correct endpoint
-            const response = await fetch(`${API_BASE_URL}/quizzes/submissions/quiz/${quizId}`, {
-                headers: {
-                    'Authorization': `Bearer ${token}`,
-                    'Content-Type': 'application/json'
-                },
-                credentials: 'include' // Ensure cookies are sent with the request
-            });
-            
-            console.log('Response status:', response.status);
-            console.log('Response headers:', Object.fromEntries(response.headers.entries()));
-            
-            if (response.status === 401) {
-                // Token might be expired or invalid
-                console.error('Authentication error - token might be expired or invalid');
-                // Redirect to login or refresh token if you have a refresh token flow
-                window.location.href = '/login.html';
-                return;
-            }
-            
-            if (!response.ok) {
-                const errorData = await response.json().catch(() => ({}));
-                console.error('Error response:', errorData);
-                throw new Error(errorData.message || 'Failed to fetch submissions');
-            }
-            
-            const responseText = await response.text();
-            console.log('Raw response text:', responseText);
-            
-            let data;
-            try {
-                data = JSON.parse(responseText);
-                console.log('Parsed response data:', data);
-            } catch (e) {
-                console.error('Error parsing response as JSON:', e);
-                throw new Error('Invalid response from server');
-            }
-            
-            console.log('Submissions data from API:', data);
-            
-            // Check if data.data exists and is an array
-            const submissions = Array.isArray(data.data) ? data.data : [];
-            console.log('Number of submissions found:', submissions.length);
-            console.log('Processed submissions:', submissions);
-            
-            // Log each submission for debugging
-            submissions.forEach((sub, index) => {
-                console.log(`Submission ${index}:`, {
-                    studentName: sub.studentName,
-                    studentEmail: sub.studentEmail,
-                    _id: sub._id,
-                    sub: JSON.stringify(sub, null, 2)
-                });
-            });
-            
-            // Create the submissions HTML
-            const submissionsHtml = `
-                <div class="modal-header">
-                    <h5 class="modal-title">Quiz Submissions</h5>
-                    <button type="button" class="close" data-dismiss="modal">&times;</button>
-                </div>
-                <div class="modal-body">
-                    ${submissions.length === 0 ? `
-                        <div class="text-center py-4">
-                            <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
-                            <p>No submissions found for this quiz yet.</p>
-                        </div>` : `
-                        <div class="table-responsive">
-                            <table class="table table-striped">
-                                <thead>
+            <div class="modal-body">
+                ${submissions.length === 0 ? `
+                    <div class="text-center py-4">
+                        <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
+                        <p>No submissions found for this quiz yet.</p>
+                    </div>` : `
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Student</th>
+                                    <th>Email</th>
+                                    <th>Score</th>
+                                    <th>Status</th>
+                                    <th>Submitted At</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${submissions.map(sub => {
+                                    const studentName = sub.studentName || 'N/A';
+                                    const studentEmail = sub.studentEmail || 'N/A';
+                                    const score = sub.score || 0;
+                                    const totalQuestions = sub.totalQuestions || 0;
+                                    const percentage = sub.percentage || 0;
+                                    const passed = sub.passed || false;
+                                    const submittedAt = sub.submittedAt ? new Date(sub.submittedAt).toLocaleString() : 'N/A';
+                                    const submissionId = sub._id || '';
+                                    
+                                    return `
                                     <tr>
-                                        <th>Student</th>
-                                        <th>Email</th>
-                                        <th>Score</th>
-                                        <th>Status</th>
-                                        <th>Submitted At</th>
-                                        <th>Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    ${submissions.map(sub => {
-                                        const studentName = sub.studentName || 'N/A';
-                                        const studentEmail = sub.studentEmail || 'N/A';
-                                        const score = sub.score || 0;
-                                        const totalQuestions = sub.totalQuestions || 0;
-                                        const percentage = sub.percentage || 0;
-                                        const passed = sub.passed || false;
-                                        const submittedAt = sub.submittedAt ? new Date(sub.submittedAt).toLocaleString() : 'N/A';
-                                        const submissionId = sub._id || '';
-                                        
-                                        return `
-                                        <tr>
-                                            <td>${studentName}</td>
-                                            <td>${studentEmail}</td>
-                                            <td>${score}/${totalQuestions} (${percentage}%)</td>
-                                            <td>
-                                                <span class="badge ${passed ? 'bg-success' : 'bg-danger'}">
-                                                    ${passed ? 'Passed' : 'Failed'}
-                                                </span>
-                                            </td>
-                                            <td>${submittedAt}</td>
-                                            <td>
-                                                <button class="btn btn-sm btn-primary view-submission" 
-                                                        data-submission-id="${submissionId}">
-                                                    <i class="fas fa-eye"></i> View
-                                                </button>
-                                            </td>
-                                        </tr>`;
-                                    }).join('')}
-                                </tbody>
-                            </table>
-                        </div>`}
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                </div>
-            `;
-            
-            // Update modal content
-            modal.querySelector('.modal-content').innerHTML = submissionsHtml;
-            
-            // Reinitialize the modal to apply the new content
-            const newModalInstance = new bootstrap.Modal(modal);
-            
-            // Add event listeners for view buttons
-            modal.querySelectorAll('.view-submission').forEach(button => {
-                button.addEventListener('click', (e) => {
-                    const submissionId = e.target.closest('button').dataset.submissionId;
-                    if (submissionId) {
-                        viewSubmissionDetails(submissionId);
-                    }
-                });
-            });
-            
-        } catch (error) {
-            console.error('Error fetching submissions:', error);
-            const errorHtml = `
-                <div class="modal-header">
-                    <h5 class="modal-title text-danger">Error</h5>
-                    <button type="button" class="close" data-dismiss="modal">&times;</button>
-                </div>
-                <div class="modal-body">
-                    <div class="alert alert-danger">
-                        <i class="fas fa-exclamation-triangle me-2"></i>
-                        ${error.message || 'Failed to load submissions. Please try again later.'}
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-primary" onclick="location.reload()">
-                        <i class="fas fa-sync-alt me-1"></i> Retry
-                    </button>
-                </div>
-            `;
-            modal.querySelector('.modal-content').innerHTML = errorHtml;
-        }
-    }
-    
-    // Function to view submission details
-    async function viewSubmissionDetails(submissionId) {
-        // Create or get modal element
-        let modal = document.getElementById('submissionDetailsModal');
-        
-        // Initialize or update modal
-        if (!modal) {
-            modal = document.createElement('div');
-            modal.id = 'submissionDetailsModal';
-            modal.className = 'modal fade';
-            modal.tabIndex = '-1';
-            modal.setAttribute('aria-labelledby', 'submissionDetailsModalLabel');
-            modal.setAttribute('aria-hidden', 'true');
-            document.body.appendChild(modal);
-        }
-        
-        // Show loading state
-        modal.innerHTML = `
-            <div class="modal-dialog modal-lg">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title">Submission Details</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body text-center py-4">
-                        <div class="spinner-border text-primary" role="status">
-                            <span class="visually-hidden">Loading...</span>
-                        </div>
-                        <p class="mt-2">Loading submission details...</p>
-                    </div>
-                </div>
+                                        <td>${studentName}</td>
+                                        <td>${studentEmail}</td>
+                                        <td>${score}/${totalQuestions} (${percentage}%)</td>
+                                        <td>
+                                            <span class="badge ${passed ? 'bg-success' : 'bg-danger'}">
+                                                ${passed ? 'Passed' : 'Failed'}
+                                            </span>
+                                        </td>
+                                        <td>${submittedAt}</td>
+                                        <td>
+                                            <button class="btn btn-sm btn-primary view-submission" 
+                                                    data-submission-id="${submissionId}">
+                                                <i class="fas fa-eye"></i> View
+                                            </button>
+                                        </td>
+                                    </tr>`;
+                                }).join('')}
+                            </tbody>
+                        </table>
+                    </div>`}
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
             </div>
         `;
         
-        // Initialize and show modal
-        const modalInstance = new bootstrap.Modal(modal);
-        modalInstance.show();
+        modal.querySelector('.modal-content').innerHTML = submissionsHtml;
         
-        try {
-            const token = localStorage.getItem('token');
-            if (!token) {
-                checkAuth();
-                return;
-            }
-            
-            console.log('Fetching submission details for ID:', submissionId);
-            
-            // Fetch submission details
-            const response = await fetch(`${API_BASE_URL}/quizzes/submissions/${submissionId}`, {
-                headers: {
-                    'Authorization': `Bearer ${token}`,
-                    'Content-Type': 'application/json'
+        const newModalInstance = new bootstrap.Modal(modal);
+        
+        modal.querySelectorAll('.view-submission').forEach(button => {
+            button.addEventListener('click', (e) => {
+                const submissionId = e.target.closest('button').dataset.submissionId;
+                if (submissionId) {
+                    viewSubmissionDetails(submissionId);
                 }
             });
-            
-            console.log('Response status:', response.status);
-            
-            if (response.status === 401) {
-                console.error('Authentication error - token might be expired or invalid');
-                checkAuth();
-                return;
+        });
+        
+    } catch (error) {
+        console.error('Error fetching submissions:', error);
+        const errorHtml = `
+            <div class="modal-header">
+                <h5 class="modal-title text-danger">Error</h5>
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-danger">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    ${error.message || 'Failed to load submissions. Please try again later.'}
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" onclick="location.reload()">
+                    <i class="fas fa-sync-alt me-1"></i> Retry
+                </button>
+            </div>
+        `;
+        modal.querySelector('.modal-content').innerHTML = errorHtml;
+    }
+}
+
+// Function to view submission details
+async function viewSubmissionDetails(submissionId) {
+    let modal = document.getElementById('submissionDetailsModal');
+    
+    if (!modal) {
+        modal = document.createElement('div');
+        modal.id = 'submissionDetailsModal';
+        modal.className = 'modal fade';
+        modal.tabIndex = '-1';
+        modal.setAttribute('aria-labelledby', 'submissionDetailsModalLabel');
+        modal.setAttribute('aria-hidden', 'true');
+        document.body.appendChild(modal);
+    }
+    
+    modal.innerHTML = `
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Submission Details</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body text-center py-4">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                    <p class="mt-2">Loading submission details...</p>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    const modalInstance = new bootstrap.Modal(modal);
+    modalInstance.show();
+    
+    try {
+        const token = localStorage.getItem('token');
+        if (!token) {
+            checkAuth();
+            return;
+        }
+        
+        console.log('Fetching submission details for ID:', submissionId);
+        
+        const response = await fetch(`${API_BASE_URL}/api/quizzes/submissions/${submissionId}`, {
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
             }
-            
-            if (!response.ok) {
-                const errorData = await response.json().catch(() => ({}));
-                throw new Error(errorData.message || 'Failed to fetch submission details');
-            }
-            
-            const submission = await response.json();
-            console.log('Submission details:', submission);
-            
-            if (!submission) {
-                throw new Error('No submission data received');
-            }
-            
-            const submissionDate = new Date(submission.submittedAt).toLocaleString();
+        });
+        
+        console.log('Response status:', response.status);
+        
+        if (response.status === 401) {
+            console.error('Authentication error - token might be expired or invalid');
+            checkAuth();
+            return;
+        }
+        
+        if (!response.ok) {
+            const errorData = await response.json().catch(() => ({}));
+            throw new Error(errorData.message || 'Failed to fetch submission details');
+        }
+        
+        const submission = await response.json();
+        console.log('Submission details:', submission);
+        
+        if (!submission) {
+            throw new Error('No submission data received');
+        }
+        
+        const submissionDate = new Date(submission.submittedAt).toLocaleString();
+        // Continue with displaying submission details as before...
+    } catch (error) {
+        console.error('Error fetching submission details:', error);
+        // Handle error display in modal
+    }
+}
+
             
             // Generate questions HTML
             const questionsHtml = (submission.questions || []).map((q, index) => {
