@@ -43,6 +43,12 @@ app.use((req, res, next) => {
 });
 
 // -------------------------
+// Serve uploaded resources
+// -------------------------
+const uploadsPath = path.join(__dirname, 'uploads');
+app.use('/uploads', express.static(uploadsPath));
+
+// -------------------------
 // Static assets (frontend)
 // -------------------------
 const publicFrontendPath = path.join(__dirname, 'frontend_public');
@@ -89,8 +95,6 @@ app.use('/api/quizzes', require('./routes/quizRoutes'));
 app.use('/api/classes-alt', require('./routes/class')); // if this is different
 app.use('/api/health', require('./routes/health')); // keep this for health checks
 
-
-
 // -------------------------
 // Frontend routes
 // -------------------------
@@ -122,9 +126,3 @@ mongoose.connection.once('open', () => {
     console.log(`🚀 Server running on port ${PORT}`);
   });
 });
-
-// -------------------------
-// Serve uploaded resources
-// -------------------------
-const uploadsPath = path.join(__dirname, 'uploads');
-app.use('/uploads', express.static(uploadsPath));
