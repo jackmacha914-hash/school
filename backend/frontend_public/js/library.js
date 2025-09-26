@@ -212,7 +212,9 @@ if (typeof API_BASE_URL === 'undefined') {
     window.API_BASE_URL = 'https://school-93dy.onrender.com';
 }
 
-                                        method: 'PUT',
+                                    try {
+                                    const res = await fetch(`${API_BASE_URL}/books/${bookId}`, {    
+                                    method: 'PUT',
                                         headers: {
                                             'Content-Type': 'application/json',
                                             'Authorization': `Bearer ${token}`,
