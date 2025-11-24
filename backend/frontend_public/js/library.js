@@ -283,7 +283,7 @@ if (libraryForm) {
         const token = localStorage.getItem('token');
 
         try {
-            const res = await fetch(`${window.API_CONFIG.BASE_URL}/books`, {
+            const res = await fetch(`${window.API_CONFIG.BOOKS_URL}/books`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
