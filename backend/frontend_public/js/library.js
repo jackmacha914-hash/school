@@ -258,7 +258,7 @@ if (typeof API_BASE_URL === 'undefined') {
                     }
                 }
 
-                        // Add New Book Handler
+                    // Add New Book Handler
 const libraryForm = document.getElementById('library-form');
 
 if (libraryForm) {
@@ -279,29 +279,40 @@ if (libraryForm) {
             return;
         }
 
-        // Get auth token if your API requires it
+        // Get auth token
         const token = localStorage.getItem('token');
+        if (!token) {
+            alert('You are not logged in. Please log in first.');
+            return;
+        }
+
+        // Debug logs
+        console.log('Adding book:', { title, author, year, genre, className, available });
+        console.log('POST URL:', window.API_CONFIG.BOOKS_URL);
+        console.log('Token:', token);
 
         try {
-            const res = await fetch(`${window.API_CONFIG.BOOKS_URL}/books`, {
+            const res = await fetch(window.API_CONFIG.BOOKS_URL, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'Authorization': token ? `Bearer ${token}` : ''
+                    'Authorization': `Bearer ${token}`
                 },
                 body: JSON.stringify({ title, author, year, genre, className, available })
             });
 
+            const data = await res.json().catch(() => ({}));
+
             if (res.ok) {
                 alert('Book added successfully!');
-                libraryForm.reset(); // clear form
+                libraryForm.reset();
                 loadLibraryWithFilters(); // refresh table
             } else {
-                const errorData = await res.json().catch(() => ({}));
-                alert('Failed to add book: ' + (errorData.message || 'Unknown error'));
+                console.error('Failed to add book:', data);
+                alert('Failed to add book: ' + (data.message || 'Unknown error'));
             }
         } catch (err) {
-            console.error('Error adding book:', err);
+            console.error('Network error while adding book:', err);
             alert('Network error. Could not add book.');
         }
     });
