@@ -50,6 +50,7 @@ window.apiFetch = async function apiFetch(url, options = {}) {
 }
 
 // DOM Elements
+document.addEventListener('DOMContentLoaded', () => {
 const libraryForm = document.getElementById('library-form');
 const libraryList = document.getElementById('library-list');
 const librarySearch = document.getElementById('library-search');
@@ -2164,3 +2165,4 @@ if (document.readyState === 'loading') {
     // Show available books tab by default
     showLibraryTab('available-books');
 }
+    });
