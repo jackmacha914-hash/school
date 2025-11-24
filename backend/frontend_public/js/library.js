@@ -257,6 +257,56 @@ if (typeof API_BASE_URL === 'undefined') {
                         }
                     }
                 }
+
+                        // Add New Book Handler
+const libraryForm = document.getElementById('library-form');
+
+if (libraryForm) {
+    libraryForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        // Collect form values
+        const title = document.getElementById('book-title').value.trim();
+        const author = document.getElementById('book-author').value.trim();
+        const year = parseInt(document.getElementById('book-year').value) || new Date().getFullYear();
+        const genre = document.getElementById('book-genre').value;
+        const className = document.getElementById('book-class').value;
+        const available = parseInt(document.getElementById('book-available').value) || 1;
+
+        // Simple validation
+        if (!title || !author || !genre || !className) {
+            alert('Please fill in all required fields.');
+            return;
+        }
+
+        // Get auth token if your API requires it
+        const token = localStorage.getItem('token');
+
+        try {
+            const res = await fetch(`${window.API_CONFIG.BASE_URL}/books`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': token ? `Bearer ${token}` : ''
+                },
+                body: JSON.stringify({ title, author, year, genre, className, available })
+            });
+
+            if (res.ok) {
+                alert('Book added successfully!');
+                libraryForm.reset(); // clear form
+                loadLibraryWithFilters(); // refresh table
+            } else {
+                const errorData = await res.json().catch(() => ({}));
+                alert('Failed to add book: ' + (errorData.message || 'Unknown error'));
+            }
+        } catch (err) {
+            console.error('Error adding book:', err);
+            alert('Network error. Could not add book.');
+        }
+    });
+}
+
                 // Issue Book
                 else if (btn.classList.contains('issue-book-btn')) {
                     console.log('Issue button clicked'); // Debug log
