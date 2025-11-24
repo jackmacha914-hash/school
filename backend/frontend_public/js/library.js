@@ -246,7 +246,7 @@ if (typeof API_BASE_URL === 'undefined') {
                                             universalEditMsg.style.display = 'block';
                                         }
                                     }
-                                } catch {
+                                } catch (err) {
                                     if (universalEditMsg) {
                                         universalEditMsg.textContent = 'Network error.';
                                         universalEditMsg.style.color = 'red';
