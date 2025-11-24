@@ -208,9 +208,7 @@ async function loadLibraryWithFilters() {
                                 const copies = parseInt(formData.get('copies')) || 1;
                                 try {
                                        // API base URL - update this to your actual API URL
-if (typeof API_BASE_URL === 'undefined') {
-    window.API_BASE_URL = 'https://school-93dy.onrender.com';
-}
+const API_BASE_URL = window.API_CONFIG?.BASE_URL || 'https://school-93dy.onrender.com';
 
                                     try {
                                     const res = await fetch(`${API_BASE_URL}/books/${bookId}`, {    
