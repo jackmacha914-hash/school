@@ -8,7 +8,6 @@ const bookSchema = new mongoose.Schema({
   genre: { type: String, required: true },
   className: { type: String, required: true },
   status: { type: String, default: 'available' },
-  copies: { type: Number, required: true, default: 1, min: 0 },
   available: { type: Number, default: 1, min: 0 }
 });
 
