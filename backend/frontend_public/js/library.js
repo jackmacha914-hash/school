@@ -258,6 +258,7 @@ const API_BASE_URL = window.API_CONFIG?.BASE_URL || 'https://school-93dy.onrende
                 }
 
                     // Add New Book Handler
+document.addEventListener('DOMContentLoaded', () => {
 const libraryForm = document.getElementById('library-form');
 
 if (libraryForm) {
@@ -2163,3 +2164,7 @@ if (document.readyState === 'loading') {
     showLibraryTab('available-books');
 }
     });
+document.addEventListener('DOMContentLoaded', () => {
+    initLibrary(); // this ensures everything initializes properly
+});
+
