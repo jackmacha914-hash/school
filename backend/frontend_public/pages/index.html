@@ -1768,6 +1768,17 @@ window.fetch = async (input, init = {}) => {
                     <input type="text" id="book-title" placeholder="Book Title" required>
                     <input type="text" id="book-author" placeholder="Author" required>
                     <input type="number" id="book-year" placeholder="Publication Year" min="1000" max="2099" value="2025">
+                      <!-- Add this select for genre -->
+        <select id="book-genre" required>
+            <option value="">Select Genre</option>
+            <option value="Fiction">Fiction</option>
+            <option value="Non-Fiction">Non-Fiction</option>
+            <option value="Science">Science</option>
+            <option value="History">History</option>
+            <option value="Biography">Biography</option>
+            <option value="Children">Children</option>
+            <option value="Other">Other</option>
+        </select>
                     <select id="book-class" required>
                         <option value="">Select Class</option>
                         <optgroup label="Pre-Primary">
