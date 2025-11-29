@@ -302,14 +302,9 @@ function initializeLibraryForm() {
     const libraryForm = document.getElementById('library-form');
 
     // Add submit handler with better error handling
-    libraryForm.onsubmit = async function(e) {
-        // Prevent default form submission
-        if (e) {
-            e.preventDefault();
-            e.stopPropagation();
-        } else if (window.event) {
-            window.event.returnValue = false;
-        }
+    libraryForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        e.stopPropagation();
         
         console.log('Form submission started...');
         
@@ -371,7 +366,7 @@ function initializeLibraryForm() {
                 body: JSON.stringify(formData)
             });
 
-            const result = await response.json().catch(err => ({}));
+            const result = await response.json().catch(() => ({}));
             console.log('API Response:', { status: response.status, result });
 
             if (!response.ok) {
@@ -385,7 +380,7 @@ function initializeLibraryForm() {
             // Refresh the book list if the function exists
             if (typeof loadLibraryWithFilters === 'function') {
                 console.log('Refreshing book list...');
-                alert(`Error: ${error.message || 'Failed to add book. Check console for details.'}`);
+                await loadLibraryWithFilters();
             }
         } catch (error) {
             console.error('Error in form submission:', {
@@ -396,9 +391,8 @@ function initializeLibraryForm() {
             alert(`Error: ${error.message || 'Failed to add book. Check console for details.'}`);
         }
         
-        // Explicitly return false to prevent form submission
         return false;
-    };
+    });
 
     console.log('Library form initialized successfully');
 }
