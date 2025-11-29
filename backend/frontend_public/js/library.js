@@ -7,6 +7,9 @@
  * @param {Object} options - Fetch options
  * @returns {Promise<any>} - The parsed JSON response
  */
+// Global variable for the library table body
+let libraryTableBody;
+
 window.apiFetch = async function apiFetch(url, options = {}) {
     const token = localStorage.getItem('token');
     const defaultHeaders = {
@@ -78,6 +81,11 @@ window.apiFetch = async function apiFetch(url, options = {}) {
 }
 
 // DOM Elements
+
+document.addEventListener('DOMContentLoaded', () => {
+    // Initialize the table body
+    libraryTableBody = document.getElementById('library-table-body');
+    
 document.addEventListener('DOMContentLoaded', () => {
 const libraryForm = document.getElementById('library-form');
 const libraryList = document.getElementById('library-list');
