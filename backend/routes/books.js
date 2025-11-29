@@ -31,13 +31,23 @@ router.get('/', async (req, res) => {
 // Add a new book
 router.post('/', async (req, res) => {
     const { title, author, year, genre, status } = req.body;
-    const book = new Book({ title, author, year, genre, status });
+    console.log('Attempting to save book with data:', { title, author, year, genre, status });
+    console.log('Environment:', process.env.NODE_ENV);
+    console.log('MongoDB URI exists:', !!process.env.MONGODB_URI);
 
     try {
-        await book.save();
-        res.status(201).json(book);
-    } catch (err) {
-        res.status(400).json({ message: err.message });
+        const book = new Book({ title, author, year, genre, status });
+        console.log('Book instance created, attempting to save...');
+        const savedBook = await book.save();
+        console.log('Book saved successfully:', savedBook);
+        res.status(201).json(savedBook);
+    } catch (error) {
+        console.error('Error saving book:', error);
+        res.status(500).json({ 
+            message: 'Failed to save book',
+            error: error.message,
+            stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
+        });
     }
 });
 
