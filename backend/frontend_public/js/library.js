@@ -85,10 +85,6 @@ window.apiFetch = async function apiFetch(url, options = {}) {
 document.addEventListener('DOMContentLoaded', () => {
     // Initialize the table body
     libraryTableBody = document.getElementById('library-table-body');
-    
-document.addEventListener('DOMContentLoaded', () => {
-const libraryForm = document.getElementById('library-form');
-const libraryList = document.getElementById('library-list');
 const librarySearch = document.getElementById('library-search');
 const libraryGenreFilter = document.getElementById('library-genre-filter');
 const libraryAuthorFilter = document.getElementById('library-author-filter');
@@ -266,7 +262,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
 
                 console.log('Sending request to:', window.API_CONFIG?.BOOKS_URL);
-                const response = await fetch(window.API_CONFIG?.BOOKS_URL, {
+                const response = await fetch('https://school-93dy.onrender.com/api/books', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
