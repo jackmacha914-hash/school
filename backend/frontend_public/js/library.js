@@ -21,9 +21,23 @@ window.apiFetch = async function apiFetch(url, options = {}) {
     };
 
     try {
-        const response = await fetch(`${window.API_CONFIG?.BASE_URL || ''}${url}`, {
+        const fullUrl = `${window.API_CONFIG?.BASE_URL || ''}${url}`;
+        console.log('API Request:', fullUrl, { method: options.method || 'GET', headers, body: options.body });
+        
+        const response = await fetch(fullUrl, {
             ...options,
             headers
+        });
+
+        // Log response for debugging
+        const responseClone = response.clone(); // Clone to read stream twice
+        const responseText = await responseClone.text();
+        console.log('API Response:', {
+            status: response.status,
+            statusText: response.statusText,
+            url: response.url,
+            headers: Object.fromEntries(response.headers.entries()),
+            body: responseText
         });
 
         if (!response.ok) {
@@ -32,8 +46,16 @@ window.apiFetch = async function apiFetch(url, options = {}) {
                 window.location.href = '/login.html';
                 return Promise.reject(new Error('Unauthorized'));
             }
-            const error = await response.json().catch(() => ({}));
-            throw new Error(error.message || 'API request failed');
+            let errorData;
+            try {
+                errorData = await response.json();
+            } catch (e) {
+                errorData = { message: responseText || 'Unknown error occurred' };
+            }
+            const error = new Error(errorData.message || 'API request failed');
+            error.status = response.status;
+            error.data = errorData;
+            throw error;
         }
 
         // Handle empty responses
@@ -44,7 +66,13 @@ window.apiFetch = async function apiFetch(url, options = {}) {
 
         return await response.json();
     } catch (error) {
-        console.error('API Error:', error);
+        console.error('API Error:', {
+            message: error.message,
+            name: error.name,
+            stack: error.stack,
+            status: error.status,
+            data: error.data
+        });
         throw error;
     }
 }
