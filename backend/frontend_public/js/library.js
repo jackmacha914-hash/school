@@ -149,6 +149,7 @@ function buildLibraryQueryString(filters) {
  */
 async function loadLibraryWithFilters() {
     try {
+        console.log('Loading books...');
         const filters = getLibraryFilters();
         const queryString = buildLibraryQueryString(filters);
         
@@ -158,132 +159,74 @@ async function loadLibraryWithFilters() {
         }
         
         // Make API request using the apiFetch utility
-        const books = await apiFetch(`/books${queryString}`, {
+        const response = await apiFetch(`/books${queryString}`, {
             headers: {
                 'Cache-Control': 'no-cache',
                 'Pragma': 'no-cache'
             }
         });
         
-        console.log('Received books:', books);
+        console.log('API Response:', response);
+        
+        // Handle both response formats: {data: [...]} and [...]
+        const books = Array.isArray(response) ? response : (response.data || []);
+        console.log('Books to display:', books);
         
         // Update the UI with the received books
         if (libraryTableBody) {
             libraryTableBody.innerHTML = '';
-            if (Array.isArray(books) && books.length > 0) {
+            
+            if (books.length > 0) {
                 books.forEach(book => {
-                    libraryTableBody.insertAdjacentHTML('beforeend', renderBookRow(book));
+                    const row = `
+                        <tr data-id="${book._id}">
+                            <td>${book.title || 'N/A'}</td>
+                            <td>${book.author || 'N/A'}</td>
+                            <td>${book.genre || 'N/A'}</td>
+                            <td>${book.className || 'N/A'}</td>
+                            <td>${book.available !== undefined ? book.available : 0} / ${book.copies || 1}</td>
+                            <td>
+                                <button class="edit-book-btn" data-id="${book._id}">Edit</button>
+                            </td>
+                        </tr>
+                    `;
+                    libraryTableBody.insertAdjacentHTML('beforeend', row);
                 });
             } else {
-                libraryTableBody.innerHTML = '<tr><td colspan="5" class="text-center">No books found matching your criteria.</td></tr>';
+                libraryTableBody.innerHTML = '<tr><td colspan="5" class="text-center">No books found in the library.</td></tr>';
             }
         }
-        // Add event listeners for checkboxes
+        
+        // Re-attach event listeners after updating the table
+        attachBookEventListeners();
+        
+    } catch (error) {
+        console.error('Error loading books:', error);
         if (libraryTableBody) {
-            libraryTableBody.addEventListener('click', async (e) => {
-                const btn = e.target;
-                const bookId = btn.getAttribute('data-id');
-                if (!bookId) return;
-                const token = localStorage.getItem('token');
-                // Edit Book (universal modal)
-                if (btn.classList.contains('edit-book-btn')) {
-                    const tr = btn.closest('tr');
-                    const currentTitle = tr.querySelector('td:nth-child(2)').textContent;
-                    const currentAuthor = tr.querySelector('td:nth-child(3)').textContent;
-                    const currentDesc = tr.querySelector('td:nth-child(4)').textContent;
-                    const universalEditModal = document.getElementById('universal-edit-modal');
-                    const universalEditForm = document.getElementById('universal-edit-form');
-                    const universalEditMsg = document.getElementById('universal-edit-msg');
-                    if (universalEditForm) {
-                        universalEditForm.innerHTML = `
-                            <input type="hidden" name="bookId" value="${bookId}" />
-                            <div class='form-group'><label>Title:</label><input type='text' name='title' value='${currentTitle}' required /></div>
-                            <div class='form-group'><label>Author:</label><input type='text' name='author' value='${currentAuthor}' required /></div>
-                            <div class='form-group'><label>Year:</label><input type='number' name='year' min='1000' max='2099' value='${book.year || new Date().getFullYear()}' /></div>
-                            <div class='form-group'><label>Copies:</label><input type='number' name='copies' min='1' value='${book.copies || 1}' required /></div>
-                            <div class='form-group'>
-                                <label>Genre:</label>
-                                <select name='genre' required>
-                                    <option value='Fiction' ${book.genre === 'Fiction' ? 'selected' : ''}>Fiction</option>
-                                    <option value='Non-Fiction' ${book.genre === 'Non-Fiction' ? 'selected' : ''}>Non-Fiction</option>
-                                    <option value='Science' ${book.genre === 'Science' ? 'selected' : ''}>Science</option>
-                                    <option value='History' ${book.genre === 'History' ? 'selected' : ''}>History</option>
-                                    <option value='Biography' ${book.genre === 'Biography' ? 'selected' : ''}>Biography</option>
-                                    <option value='Children' ${book.genre === 'Children' ? 'selected' : ''}>Children</option>
-                                </select>
-                            </div>
-                            <div class='form-group'>
-                                <label>Status:</label>
-                                <select name='status'>
-                                    <option value='available' ${book.status === 'available' ? 'selected' : ''}>Available</option>
-                                    <option value='checked-out' ${book.status === 'checked-out' ? 'selected' : ''}>Checked Out</option>
-                                    <option value='lost' ${book.status === 'lost' ? 'selected' : ''}>Lost</option>
-                                </select>
-                            </div>
-                            <button type='submit'>Save Changes</button>
-                        `;
-                        if (universalEditMsg) universalEditMsg.style.display = 'none';
-                        if (universalEditModal) {
-                            universalEditModal.style.display = 'block';
-                            universalEditForm.onsubmit = async (ev) => {
-                                ev.preventDefault();
-                                if (universalEditMsg) universalEditMsg.style.display = 'none';
-                                const formData = new FormData(universalEditForm);
-                                const title = formData.get('title');
-                                const author = formData.get('author');
-                                const year = formData.get('year');
-                                const genre = formData.get('genre');
-                                const status = formData.get('status') || 'available';
-                                const copies = parseInt(formData.get('copies')) || 1;
-                                try {
-                                       // API base URL - update this to your actual API URL
-const API_BASE_URL = window.API_CONFIG?.BASE_URL || 'https://school-93dy.onrender.com';
+            libraryTableBody.innerHTML = `
+                <tr>
+                    <td colspan="5" class="text-center error">
+                        Error loading books: ${error.message}
+                    </td>
+                </tr>`;
+        }
+    }
+}
 
-                                    try {
-                                    const res = await fetch(`${API_BASE_URL}/books/${bookId}`, {    
-                                    method: 'PUT',
-                                        headers: {
-                                            'Content-Type': 'application/json',
-                                            'Authorization': `Bearer ${token}`,
-                                        },
-                                        body: JSON.stringify({ 
-                                            title, 
-                                            author, 
-                                            year: year ? parseInt(year) : new Date().getFullYear(),
-                                            genre,
-                                            status,
-                                            copies,
-                                            available: status === 'available' ? copies : 0
-                                        })
-                                    });
-                                    if (res.ok) {
-                                        if (universalEditMsg) {
-                                            universalEditMsg.textContent = 'Book updated successfully!';
-                                            universalEditMsg.style.color = 'green';
-                                            universalEditMsg.style.display = 'block';
-                                        }
-                                        setTimeout(() => {
-                                            if (universalEditModal) universalEditModal.style.display = 'none';
-                                            loadLibraryWithFilters();
-                                        }, 1000);
-                                    } else {
-                                        if (universalEditMsg) {
-                                            universalEditMsg.textContent = 'Failed to update book.';
-                                            universalEditMsg.style.color = 'red';
-                                            universalEditMsg.style.display = 'block';
-                                        }
-                                    }
-                                } catch (err) {
-                                    if (universalEditMsg) {
-                                        universalEditMsg.textContent = 'Network error.';
-                                        universalEditMsg.style.color = 'red';
-                                        universalEditMsg.style.display = 'block';
-                                    }
-                                }
-                            };
-                        }
-                    }
-                }
+// Add this new function to handle event listeners
+function attachBookEventListeners() {
+    const editButtons = document.querySelectorAll('.edit-book-btn');
+    editButtons.forEach(button => {
+        button.addEventListener('click', handleEditBook);
+    });
+}
+
+// Add this function to handle edit button clicks
+function handleEditBook(event) {
+    const bookId = event.target.getAttribute('data-id');
+    console.log('Edit book:', bookId);
+    // Your existing edit logic here
+}
 
                  // Add New Book Handler
 document.addEventListener('DOMContentLoaded', () => {
