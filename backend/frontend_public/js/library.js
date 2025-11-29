@@ -2188,21 +2188,19 @@ function initIssuedBooksSearch() {
 }
 
 // Initialize when the script is loaded
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', () => {
-        initLibrary();
-        initIssuedBooksSearch();
-        // Show available books tab by default
-        showLibraryTab('available-books');
-    });
-} else {
+function initializeLibrary() {
+    // Initialize the library components
     initLibrary();
     initIssuedBooksSearch();
+    
     // Show available books tab by default
     showLibraryTab('available-books');
 }
-    });
-document.addEventListener('DOMContentLoaded', () => {
-    initLibrary(); // this ensures everything initializes properly
-});
 
+// Set up event listeners when the DOM is fully loaded
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initializeLibrary);
+} else {
+    // If the document is already loaded, initialize immediately
+    initializeLibrary();
+}
