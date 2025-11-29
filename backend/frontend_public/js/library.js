@@ -12,6 +12,18 @@ let libraryTableBody;
 // Prefer simple, prompt-based handlers for actions and single loader
 window.LIBRARY_SIMPLE_HANDLERS = true;
 
+// Hoisted DOM references used across functions
+let librarySearch,
+    libraryGenreFilter,
+    libraryAuthorFilter,
+    libraryClassFilter,
+    libraryBulkToolbar,
+    libraryBulkDelete,
+    libraryBulkExport,
+    selectAllLibrary,
+    issuedBooksSearch,
+    issuedBooksList;
+
 window.apiFetch = async function apiFetch(url, options = {}) {
     const token = localStorage.getItem('token');
     const defaultHeaders = {
@@ -87,16 +99,16 @@ window.apiFetch = async function apiFetch(url, options = {}) {
 document.addEventListener('DOMContentLoaded', () => {
     // Initialize the table body
     libraryTableBody = document.getElementById('library-table-body');
-const librarySearch = document.getElementById('library-search');
-const libraryGenreFilter = document.getElementById('library-genre-filter');
-const libraryAuthorFilter = document.getElementById('library-author-filter');
-const libraryClassFilter = document.getElementById('library-class-filter');
-const libraryBulkToolbar = document.getElementById('library-bulk-toolbar');
-const libraryBulkDelete = document.getElementById('library-bulk-delete');
-const libraryBulkExport = document.getElementById('library-bulk-export');
-const selectAllLibrary = document.getElementById('select-all-library');
-const issuedBooksSearch = document.getElementById('issued-books-search');
-const issuedBooksList = document.getElementById('issued-books-list');
+librarySearch = document.getElementById('library-search');
+libraryGenreFilter = document.getElementById('library-genre-filter');
+libraryAuthorFilter = document.getElementById('library-author-filter');
+libraryClassFilter = document.getElementById('library-class-filter');
+libraryBulkToolbar = document.getElementById('library-bulk-toolbar');
+libraryBulkDelete = document.getElementById('library-bulk-delete');
+libraryBulkExport = document.getElementById('library-bulk-export');
+selectAllLibrary = document.getElementById('select-all-library');
+issuedBooksSearch = document.getElementById('issued-books-search');
+issuedBooksList = document.getElementById('issued-books-list');
 
 // Tab functionality
 window.showLibraryTab = function(tabId) {
@@ -133,9 +145,9 @@ let selectedBookIds = new Set();
 // --- Advanced Filters for Library ---
 function getLibraryFilters() {
     return {
-        search: librarySearch.value.trim(),
-        genre: libraryGenreFilter.value,
-        author: libraryAuthorFilter.value.trim(),
+        search: librarySearch ? librarySearch.value.trim() : '',
+        genre: libraryGenreFilter ? libraryGenreFilter.value : '',
+        author: libraryAuthorFilter ? libraryAuthorFilter.value.trim() : '',
         className: libraryClassFilter ? libraryClassFilter.value : ''
     };
 }
@@ -168,7 +180,7 @@ async function loadLibraryWithFilters() {
         }
         
         // Make API request using the apiFetch utility
-        const response = await apiFetch(`/books${queryString}`, {
+        const response = await apiFetch(`/api/books${queryString}`, {
             headers: {
                 'Cache-Control': 'no-cache',
                 'Pragma': 'no-cache'
@@ -236,7 +248,7 @@ function attachBookEventListeners() {
             if (!studentId) return;
             const dueDate = new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString();
             try {
-                await apiFetch('/books/issue', {
+                await apiFetch('/api/books/issue', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ bookId, studentId, dueDate })
@@ -255,7 +267,7 @@ function attachBookEventListeners() {
             const bookId = btn.getAttribute('data-id');
             if (!confirm('Are you sure you want to delete this book?')) return;
             try {
-                await apiFetch(`/books/${bookId}`, { method: 'DELETE' });
+                await apiFetch(`/api/books/${bookId}`, { method: 'DELETE' });
                 showNotification('Book deleted successfully', 'success');
                 await loadLibraryWithFilters();
             } catch (err) {
@@ -289,6 +301,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     year: parseInt(document.getElementById('book-year')?.value) || new Date().getFullYear(),
                     genre: document.getElementById('book-genre')?.value,
                     className: document.getElementById('book-class')?.value,
+                    copies: parseInt(document.getElementById('book-copies')?.value) || 1,
                     available: parseInt(document.getElementById('book-copies')?.value) || 1,
                     status: 'available'
                 };
@@ -303,28 +316,16 @@ document.addEventListener('DOMContentLoaded', () => {
                     return;
                 }
 
-                console.log('Sending request to:', window.API_CONFIG?.BOOKS_URL);
-                const response = await fetch('https://school-93dy.onrender.com/api/books', {
+                console.log('Sending request to:', window.API_CONFIG?.BOOKS_URL || '/api/books');
+                const result = await apiFetch('/api/books', {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${localStorage.getItem('token')}`
-                    },
                     body: JSON.stringify(formData)
                 });
 
-                console.log('Response status:', response.status);
-                const data = await response.json().catch(() => ({}));
-                console.log('Response data:', data);
-
-                if (response.ok) {
-                    alert('Book added successfully!');
-                    libraryForm.reset();
-                    if (typeof loadLibraryWithFilters === 'function') {
-                        loadLibraryWithFilters();
-                    }
-                } else {
-                    throw new Error(data.message || 'Failed to add book');
+                alert('Book added successfully!');
+                libraryForm.reset();
+                if (typeof loadLibraryWithFilters === 'function') {
+                    loadLibraryWithFilters();
                 }
             } catch (error) {
                 console.error('Error adding book:', {
@@ -667,28 +668,6 @@ if (!window.LIBRARY_SIMPLE_HANDLERS) {
             });
         }
 }
-        if (selectAllLibrary) {
-            selectAllLibrary.checked = false;
-            selectAllLibrary.onchange = async function() {
-                if (this.checked) {
-                    document.querySelectorAll('.library-select-checkbox').forEach(cb => {
-                        cb.checked = true;
-                        selectedBookIds.add(cb.getAttribute('data-id'));
-                    });
-                } else {
-                    document.querySelectorAll('.library-select-checkbox').forEach(cb => {
-                        cb.checked = false;
-                        selectedBookIds.delete(cb.getAttribute('data-id'));
-                    });
-                }
-                updateLibraryBulkToolbarState();
-            };
-        }
-        updateLibraryBulkToolbarState();
-    } catch (err) {
-        libraryTableBody.innerHTML = '<tr><td colspan="9">Error loading library.</td></tr>';
-    }
-}
 
 function renderBookRow(book) {
     const available = book.available !== undefined ? book.available : (book.copies || 1);
@@ -955,6 +934,26 @@ function initLibrary() {
             showNotification('Failed to load library data. Please refresh the page.', 'error');
         });
         
+        // Initialize select-all handler for bulk actions
+        if (selectAllLibrary) {
+            selectAllLibrary.checked = false;
+            selectAllLibrary.onchange = async function() {
+                if (this.checked) {
+                    document.querySelectorAll('.library-select-checkbox').forEach(cb => {
+                        cb.checked = true;
+                        selectedBookIds.add(cb.getAttribute('data-id'));
+                    });
+                } else {
+                    document.querySelectorAll('.library-select-checkbox').forEach(cb => {
+                        cb.checked = false;
+                        selectedBookIds.delete(cb.getAttribute('data-id'));
+                    });
+                }
+                updateLibraryBulkToolbarState();
+            };
+        }
+        updateLibraryBulkToolbarState();
+
         // Add event delegation for class selection change (for student selection)
         document.addEventListener('change', async (e) => {
             if (!e.target) return;
@@ -1193,7 +1192,7 @@ function initModal() {
 }
 
 const libraryFormEl = document.getElementById('library-form');
-if (libraryFormEl) {
+if (false && libraryFormEl) {
     libraryFormEl.addEventListener('submit', async (e) => {
         e.preventDefault();
         
