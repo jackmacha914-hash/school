@@ -1,4 +1,16 @@
 // Library Management Logic
+// At the top of the file
+console.log('Library script loaded');
+
+function initializeLibraryForm() {
+    console.log('initializeLibraryForm called');
+    const form = document.getElementById('library-form');
+    
+    if (!form) {
+        console.error('Library form not found!');
+        return;
+    }
+    console.log('Form element found:', form);
 // API configuration is imported from config.js (available as window.API_CONFIG)
 
 /**
@@ -2284,4 +2296,15 @@ if (document.readyState === 'loading') {
 } else {
     // If the document is already loaded, initialize immediately
     initializeLibrary();
+}
+// At the bottom of the file
+console.log('Registering DOMContentLoaded listener');
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => {
+        console.log('DOMContentLoaded - Initializing library form');
+        initializeLibraryForm();
+    });
+} else {
+    console.log('DOM already loaded - Initializing library form immediately');
+    initializeLibraryForm();
 }
