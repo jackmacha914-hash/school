@@ -30,23 +30,49 @@ router.get('/', async (req, res) => {
 
 // Add a new book
 router.post('/', async (req, res) => {
+    console.log('POST /api/books called with body:', req.body);
     const { title, author, year, genre, status } = req.body;
-    console.log('Attempting to save book with data:', { title, author, year, genre, status });
-    console.log('Environment:', process.env.NODE_ENV);
-    console.log('MongoDB URI exists:', !!process.env.MONGODB_URI);
+    
+    // Input validation
+    if (!title || !author) {
+        console.error('Missing required fields:', { title, author });
+        return res.status(400).json({ 
+            message: 'Title and author are required',
+            receivedData: req.body 
+        });
+    }
 
+    console.log('Creating book with data:', { title, author, year, genre, status });
+    
     try {
         const book = new Book({ title, author, year, genre, status });
         console.log('Book instance created, attempting to save...');
+        
         const savedBook = await book.save();
         console.log('Book saved successfully:', savedBook);
-        res.status(201).json(savedBook);
-    } catch (error) {
-        console.error('Error saving book:', error);
-        res.status(500).json({ 
+        
+        return res.status(201).json(savedBook);
+    } catch (err) {
+        console.error('Error saving book:', {
+            error: err.message,
+            name: err.name,
+            code: err.code,
+            keyPattern: err.keyPattern,
+            keyValue: err.keyValue,
+            stack: err.stack
+        });
+        
+        // More specific error handling
+        if (err.name === 'ValidationError') {
+            return res.status(400).json({ 
+                message: 'Validation Error',
+                errors: err.errors 
+            });
+        }
+        
+        return res.status(500).json({ 
             message: 'Failed to save book',
-            error: error.message,
-            stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
+            error: err.message 
         });
     }
 });
