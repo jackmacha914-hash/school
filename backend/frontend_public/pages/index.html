@@ -1765,9 +1765,10 @@ window.fetch = async (input, init = {}) => {
             <div class="form-container">
                 <h3>Add New Book</h3>
                 <form id="library-form">
-                    <input type="text" id="book-title" placeholder="Book Title" required>
-                    <input type="text" id="book-author" placeholder="Author" required>
-                    <input type="number" id="book-year" placeholder="Publication Year" min="1000" max="2099" value="2025">
+                    <input type="text" id="book-title" name="title" placeholder="Book Title" required>
+        <input type="text" id="book-author" name="author" placeholder="Author" required>
+        <input type="number" id="book-year" name="year" placeholder="Publication Year" min="1000" max="2099" value="2025">
+        <select id="book-genre" name="genre" required>
                       <!-- Add this select for genre -->
         <select id="book-genre" required>
             <option value="">Select Genre</option>
@@ -1779,8 +1780,8 @@ window.fetch = async (input, init = {}) => {
             <option value="Children">Children</option>
             <option value="Other">Other</option>
         </select>
-                    <select id="book-class" required>
-                        <option value="">Select Class</option>
+                    <select id="book-class" name="className" required>
+            <option value="">Select Class</option>
                         <optgroup label="Pre-Primary">
                             <option value="PP1">PP1</option>
                             <option value="PP2">PP2</option>
@@ -1806,13 +1807,13 @@ window.fetch = async (input, init = {}) => {
                             <option value="Grade 12">Grade 12</option>
                         </optgroup>
                     </select>
-                    <select id="book-status" required>
-                        <option value="available">Available</option>
-                        <option value="checked-out">Checked Out</option>
-                        <option value="lost">Lost</option>
-                    </select>
-                    <input type="number" id="book-copies" placeholder="Number of Copies" min="1" value="1" required>
-                    <button type="submit">Add Book</button>
+                    <select id="book-status" name="status" required>
+            <option value="available">Available</option>
+            <option value="checked-out">Checked Out</option>
+            <option value="lost">Lost</option>
+        </select>
+        <input type="number" id="book-copies" name="copies" placeholder="Number of Copies" min="1" value="1" required>
+        <button type="submit">Add Book</button>
                 </form>
             </div>
                 <div class="form-container">
