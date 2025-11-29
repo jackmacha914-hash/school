@@ -158,7 +158,7 @@ async function loadLibraryWithFilters() {
         }
         
         // Make API request using the apiFetch utility
-        const books = await apiFetch(`/library${queryString}`, {
+        const books = await apiFetch(`/books${queryString}`, {
             headers: {
                 'Cache-Control': 'no-cache',
                 'Pragma': 'no-cache'
