@@ -309,6 +309,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     const universalForm = document.getElementById('universal-edit-form');
                     const universalMsg = document.getElementById('universal-edit-msg');
                     const universalTitle = document.getElementById('universal-edit-title');
+                }
                     
                     if (universalForm && universalModal) {
                         // Clear any previous messages and reset form
