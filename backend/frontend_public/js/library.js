@@ -307,6 +307,12 @@ function initializeLibraryForm() {
         console.log('Form submission started...');
 
         try {
+            // Ensure HTML5 validation passes
+            if (typeof libraryForm.reportValidity === 'function' && !libraryForm.reportValidity()) {
+                console.warn('Form validation failed by browser');
+                return;
+            }
+
             // Get form data
             const genreValue = document.getElementById('book-genre')?.value 
                 || document.getElementById('library-genre-filter')?.value 
@@ -333,15 +339,17 @@ function initializeLibraryForm() {
             }
 
             // Resolve endpoint and ensure auth token exists
-            const url = (window.API_CONFIG && window.API_CONFIG.BOOKS_URL) ? window.API_CONFIG.BOOKS_URL : '/api/books';
+            const url = '/api/books';
             const token = localStorage.getItem('token');
             if (!token) {
                 alert('You are not logged in. Please log in and try again.');
                 return;
             }
 
-            // Make the API request
-            const response = await fetch(url, {
+            console.log('Submitting to endpoint:', url);
+
+            // Make the API request via apiFetch so headers/base URL are consistent
+            const result = await apiFetch(url, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -349,11 +357,9 @@ function initializeLibraryForm() {
                 },
                 body: JSON.stringify(formData)
             });
-
-            const result = await response.json();
             console.log('Server response:', result);
 
-            if (!response.ok) {
+            if (result && result.success === false) {
                 throw new Error(result.message || 'Failed to add book');
             }
 
