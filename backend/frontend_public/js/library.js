@@ -300,8 +300,9 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
                 // Issue Book
-                else if (btn.classList.contains('issue-book-btn')) {
+                if (btn.classList.contains('issue-book-btn')) {
                     console.log('Issue button clicked'); // Debug log
+                try{
                     const bookId = btn.getAttribute('data-id');
                     const genre = btn.getAttribute('data-genre');
                     const bookTitle = btn.closest('tr').querySelector('td:nth-child(2)').textContent;
@@ -309,6 +310,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     const universalForm = document.getElementById('universal-edit-form');
                     const universalMsg = document.getElementById('universal-edit-msg');
                     const universalTitle = document.getElementById('universal-edit-title');
+                }
                 }
                     
                     if (universalForm && universalModal) {
