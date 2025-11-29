@@ -286,58 +286,89 @@ function handleEditBook(event) {
     // Your existing edit logic here
 }
 
-                 // Add New Book Handler
-document.addEventListener('DOMContentLoaded', () => {
-    const libraryForm = document.getElementById('library-form');
-    if (libraryForm) {
-        libraryForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            console.log('Form submission started');
-            
-            try {
-                const formData = {
-                    title: document.getElementById('book-title')?.value.trim(),
-                    author: document.getElementById('book-author')?.value.trim(),
-                    year: parseInt(document.getElementById('book-year')?.value) || new Date().getFullYear(),
-                    genre: document.getElementById('book-genre')?.value,
-                    className: document.getElementById('book-class')?.value,
-                    copies: parseInt(document.getElementById('book-copies')?.value) || 1,
-                    available: parseInt(document.getElementById('book-copies')?.value) || 1,
-                    status: 'available'
-                };
-
-                console.log('Form data:', formData);
-
-                // Validate required fields
-                if (!formData.title || !formData.author || !formData.genre || !formData.className) {
-                    const error = 'Please fill in all required fields';
-                    console.error('Validation error:', error);
-                    alert(error);
-                    return;
-                }
-
-                console.log('Sending request to:', window.API_CONFIG?.BOOKS_URL || '/api/books');
-                const result = await apiFetch('/api/books', {
-                    method: 'POST',
-                    body: JSON.stringify(formData)
-                });
-
-                alert('Book added successfully!');
-                libraryForm.reset();
-                if (typeof loadLibraryWithFilters === 'function') {
-                    loadLibraryWithFilters();
-                }
-            } catch (error) {
-                console.error('Error adding book:', {
-                    error: error,
-                    message: error.message,
-                    stack: error.stack
-                });
-                alert(`Error: ${error.message || 'Failed to add book. Check console for details.'}`);
-            }
-        });
+// Make sure this runs after the DOM is fully loaded
+function initializeLibraryForm() {
+    console.log('Initializing library form...');
+    const form = document.getElementById('library-form');
+    
+    if (!form) {
+        console.error('Library form not found!');
+        return;
     }
-});
+
+    // Remove any existing event listeners
+    const newForm = form.cloneNode(true);
+    form.parentNode.replaceChild(newForm, form);
+    const libraryForm = document.getElementById('library-form');
+
+    // Add submit handler
+    libraryForm.onsubmit = async function(e) {
+        e.preventDefault();
+        console.log('Form submission started...');
+
+        try {
+            // Get form data
+            const formData = {
+                title: document.getElementById('book-title')?.value.trim(),
+                author: document.getElementById('book-author')?.value.trim(),
+                year: parseInt(document.getElementById('book-year')?.value) || new Date().getFullYear(),
+                genre: document.getElementById('book-genre')?.value,
+                className: document.getElementById('book-class')?.value,
+                copies: parseInt(document.getElementById('book-copies')?.value) || 1,
+                available: parseInt(document.getElementById('book-copies')?.value) || 1,
+                status: 'available'
+            };
+
+            console.log('Form data to submit:', formData);
+
+            // Validate required fields
+            if (!formData.title || !formData.author || !formData.genre || !formData.className) {
+                alert('Please fill in all required fields');
+                return;
+            }
+
+            // Make the API request
+            const response = await fetch('https://school-93dy.onrender.com/api/books', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${localStorage.getItem('token')}` 
+                },
+                body: JSON.stringify(formData)
+            });
+
+            const result = await response.json();
+            console.log('Server response:', result);
+
+            if (!response.ok) {
+                throw new Error(result.message || 'Failed to add book');
+            }
+
+            // Show success message
+            alert('Book added successfully!');
+            libraryForm.reset();
+            
+            // Refresh the book list
+            if (typeof loadLibraryWithFilters === 'function') {
+                console.log('Refreshing book list...');
+                await loadLibraryWithFilters();
+            }
+
+        } catch (error) {
+            console.error('Error:', error);
+            alert('Error: ' + (error.message || 'Failed to add book'));
+        }
+    };
+
+    console.log('Library form initialized successfully');
+}
+
+// Initialize when the page loads
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initializeLibraryForm);
+} else {
+    initializeLibraryForm();
+}
 if (!window.LIBRARY_SIMPLE_HANDLERS) {
                 // Issue Book
                 if (libraryTableBody) {
