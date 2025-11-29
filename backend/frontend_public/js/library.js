@@ -288,36 +288,34 @@ const API_BASE_URL = window.API_CONFIG?.BASE_URL || 'https://school-93dy.onrende
                  // Add New Book Handler
 document.addEventListener('DOMContentLoaded', () => {
     const libraryForm = document.getElementById('library-form');
-
     if (libraryForm) {
         libraryForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             console.log('Form submission started');
-
-            // Get form values
-            const formData = {
-                title: document.getElementById('book-title').value.trim(),
-                author: document.getElementById('book-author').value.trim(),
-                year: parseInt(document.getElementById('book-year').value) || new Date().getFullYear(),
-                genre: document.getElementById('book-genre').value,
-                className: document.getElementById('book-class').value,
-                available: parseInt(document.getElementById('book-available').value) || 1
-            };
-
-            console.log('Form data:', formData);
-
-            // Validate required fields
-            if (!formData.title || !formData.author || !formData.genre || !formData.className) {
-                alert('Please fill in all required fields (Title, Author, Genre, and Class).');
-                return;
-            }
-
+            
             try {
-                // Use the correct API URL from your config
-                const apiUrl = `${window.API_CONFIG.API_BASE_URL || window.API_CONFIG.BOOKS_URL || ''}/books`;
-                console.log('Making request to:', apiUrl);
+                const formData = {
+                    title: document.getElementById('book-title')?.value.trim(),
+                    author: document.getElementById('book-author')?.value.trim(),
+                    year: parseInt(document.getElementById('book-year')?.value) || new Date().getFullYear(),
+                    genre: document.getElementById('book-genre')?.value,
+                    className: document.getElementById('book-class')?.value,
+                    available: parseInt(document.getElementById('book-copies')?.value) || 1,
+                    status: 'available'
+                };
 
-                const res = await fetch(apiUrl, {
+                console.log('Form data:', formData);
+
+                // Validate required fields
+                if (!formData.title || !formData.author || !formData.genre || !formData.className) {
+                    const error = 'Please fill in all required fields';
+                    console.error('Validation error:', error);
+                    alert(error);
+                    return;
+                }
+
+                console.log('Sending request to:', window.API_CONFIG?.BOOKS_URL);
+                const response = await fetch(window.API_CONFIG?.BOOKS_URL, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -326,29 +324,26 @@ document.addEventListener('DOMContentLoaded', () => {
                     body: JSON.stringify(formData)
                 });
 
-                const data = await res.json().catch(() => ({}));
+                console.log('Response status:', response.status);
+                const data = await response.json().catch(() => ({}));
+                console.log('Response data:', data);
 
-                if (res.ok) {
+                if (response.ok) {
                     alert('Book added successfully!');
                     libraryForm.reset();
                     if (typeof loadLibraryWithFilters === 'function') {
                         loadLibraryWithFilters();
                     }
                 } else {
-                    console.error('Failed to add book:', {
-                        status: res.status,
-                        statusText: res.statusText,
-                        data: data
-                    });
-                    alert(`Failed to add book: ${data.message || 'Unknown error'}`);
+                    throw new Error(data.message || 'Failed to add book');
                 }
-            } catch (err) {
+            } catch (error) {
                 console.error('Error adding book:', {
-                    error: err,
-                    message: err.message,
-                    stack: err.stack
+                    error: error,
+                    message: error.message,
+                    stack: error.stack
                 });
-                alert('Network error. Could not add book. Check console for details.');
+                alert(`Error: ${error.message || 'Failed to add book. Check console for details.'}`);
             }
         });
     }
