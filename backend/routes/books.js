@@ -30,49 +30,55 @@ router.get('/', async (req, res) => {
 
 // Add a new book
 router.post('/', async (req, res) => {
-    console.log('POST /api/books called with body:', req.body);
-    const { title, author, year, genre, status } = req.body;
+    console.log('Received request to add book:', req.body);
     
-    // Input validation
+    const { title, author, year, genre, status, className } = req.body;
+    
+    // Log the received data
+    console.log('Book data:', { title, author, year, genre, status, className });
+    
+    // Validate required fields
     if (!title || !author) {
-        console.error('Missing required fields:', { title, author });
+        console.error('Missing required fields');
         return res.status(400).json({ 
-            message: 'Title and author are required',
-            receivedData: req.body 
+            success: false,
+            message: 'Title and author are required' 
         });
     }
 
-    console.log('Creating book with data:', { title, author, year, genre, status });
-    
     try {
-        const book = new Book({ title, author, year, genre, status });
-        console.log('Book instance created, attempting to save...');
+        const book = new Book({ 
+            title, 
+            author, 
+            year: year || new Date().getFullYear(),
+            genre: genre || 'General',
+            status: status || 'available',
+            className: className || null
+        });
+
+        console.log('Attempting to save book:', book);
         
         const savedBook = await book.save();
         console.log('Book saved successfully:', savedBook);
         
-        return res.status(201).json(savedBook);
-    } catch (err) {
-        console.error('Error saving book:', {
-            error: err.message,
-            name: err.name,
-            code: err.code,
-            keyPattern: err.keyPattern,
-            keyValue: err.keyValue,
-            stack: err.stack
+        return res.status(201).json({
+            success: true,
+            data: savedBook
         });
         
-        // More specific error handling
-        if (err.name === 'ValidationError') {
-            return res.status(400).json({ 
-                message: 'Validation Error',
-                errors: err.errors 
-            });
-        }
+    } catch (error) {
+        console.error('Error saving book:', {
+            error: error.message,
+            name: error.name,
+            code: error.code,
+            keyPattern: error.keyPattern,
+            stack: error.stack
+        });
         
-        return res.status(500).json({ 
+        res.status(500).json({ 
+            success: false,
             message: 'Failed to save book',
-            error: err.message 
+            error: process.env.NODE_ENV === 'development' ? error.message : 'Internal server error'
         });
     }
 });
