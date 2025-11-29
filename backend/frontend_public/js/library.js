@@ -9,6 +9,8 @@
  */
 // Global variable for the library table body
 let libraryTableBody;
+// Prefer simple, prompt-based handlers for actions and single loader
+window.LIBRARY_SIMPLE_HANDLERS = true;
 
 window.apiFetch = async function apiFetch(url, options = {}) {
     const token = localStorage.getItem('token');
@@ -93,7 +95,6 @@ const libraryBulkToolbar = document.getElementById('library-bulk-toolbar');
 const libraryBulkDelete = document.getElementById('library-bulk-delete');
 const libraryBulkExport = document.getElementById('library-bulk-export');
 const selectAllLibrary = document.getElementById('select-all-library');
-const libraryTableBody = document.getElementById('library-table-body');
 const issuedBooksSearch = document.getElementById('issued-books-search');
 const issuedBooksList = document.getElementById('issued-books-list');
 
@@ -154,12 +155,16 @@ function buildLibraryQueryString(filters) {
 async function loadLibraryWithFilters() {
     try {
         console.log('Loading books...');
+        // Ensure tbody reference exists even if DOMContentLoaded handler didn't run
+        if (!libraryTableBody) {
+            libraryTableBody = document.getElementById('library-table-body');
+        }
         const filters = getLibraryFilters();
         const queryString = buildLibraryQueryString(filters);
         
         // Show loading state
         if (libraryTableBody) {
-            libraryTableBody.innerHTML = '<tr><td colspan="5" class="text-center">Loading books...</td></tr>';
+            libraryTableBody.innerHTML = '<tr><td colspan="9" class="text-center">Loading books...</td></tr>';
         }
         
         // Make API request using the apiFetch utility
@@ -182,22 +187,10 @@ async function loadLibraryWithFilters() {
             
             if (books.length > 0) {
                 books.forEach(book => {
-                    const row = `
-                        <tr data-id="${book._id}">
-                            <td>${book.title || 'N/A'}</td>
-                            <td>${book.author || 'N/A'}</td>
-                            <td>${book.genre || 'N/A'}</td>
-                            <td>${book.className || 'N/A'}</td>
-                            <td>${book.available !== undefined ? book.available : 0} / ${book.copies || 1}</td>
-                            <td>
-                                <button class="edit-book-btn" data-id="${book._id}">Edit</button>
-                            </td>
-                        </tr>
-                    `;
-                    libraryTableBody.insertAdjacentHTML('beforeend', row);
+                    libraryTableBody.insertAdjacentHTML('beforeend', renderBookRow(book));
                 });
             } else {
-                libraryTableBody.innerHTML = '<tr><td colspan="5" class="text-center">No books found in the library.</td></tr>';
+                libraryTableBody.innerHTML = '<tr><td colspan="9" class="text-center">No books found in the library.</td></tr>';
             }
         }
         
@@ -209,7 +202,7 @@ async function loadLibraryWithFilters() {
         if (libraryTableBody) {
             libraryTableBody.innerHTML = `
                 <tr>
-                    <td colspan="5" class="text-center error">
+                    <td colspan="9" class="text-center error">
                         Error loading books: ${error.message}
                     </td>
                 </tr>`;
@@ -219,9 +212,58 @@ async function loadLibraryWithFilters() {
 
 // Add this new function to handle event listeners
 function attachBookEventListeners() {
-    const editButtons = document.querySelectorAll('.edit-book-btn');
-    editButtons.forEach(button => {
-        button.addEventListener('click', handleEditBook);
+    if (!libraryTableBody) {
+        libraryTableBody = document.getElementById('library-table-body');
+    }
+    if (!libraryTableBody) return;
+    if (libraryTableBody._actionsBound) return;
+    libraryTableBody._actionsBound = true;
+
+    libraryTableBody.addEventListener('click', async (e) => {
+        const btn = e.target.closest('.edit-book-btn, .issue-book-btn, .delete-book-btn');
+        if (!btn) return;
+
+        // Edit
+        if (btn.classList.contains('edit-book-btn')) {
+            handleEditBook({ target: btn });
+            return;
+        }
+
+        // Issue
+        if (btn.classList.contains('issue-book-btn')) {
+            const bookId = btn.getAttribute('data-id');
+            const studentId = prompt('Enter Student ID:');
+            if (!studentId) return;
+            const dueDate = new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString();
+            try {
+                await apiFetch('/books/issue', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ bookId, studentId, dueDate })
+                });
+                showNotification('Book issued successfully', 'success');
+                await loadLibraryWithFilters();
+            } catch (err) {
+                console.error('Error issuing book:', err);
+                showNotification(err.message || 'Failed to issue book', 'error');
+            }
+            return;
+        }
+
+        // Delete
+        if (btn.classList.contains('delete-book-btn')) {
+            const bookId = btn.getAttribute('data-id');
+            if (!confirm('Are you sure you want to delete this book?')) return;
+            try {
+                await apiFetch(`/books/${bookId}`, { method: 'DELETE' });
+                showNotification('Book deleted successfully', 'success');
+                await loadLibraryWithFilters();
+            } catch (err) {
+                console.error('Error deleting book:', err);
+                showNotification(err.message || 'Failed to delete book', 'error');
+            }
+            return;
+        }
     });
 }
 
@@ -295,327 +337,336 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 });
+if (!window.LIBRARY_SIMPLE_HANDLERS) {
                 // Issue Book
-                if (btn.classList.contains('issue-book-btn')) {
-                    console.log('Issue button clicked'); // Debug log
-                }
-                try{
-                    const bookId = btn.getAttribute('data-id');
-                    const genre = btn.getAttribute('data-genre');
-                    const bookTitle = btn.closest('tr').querySelector('td:nth-child(2)').textContent;
-                    const universalModal = document.getElementById('universal-edit-modal');
-                    const universalForm = document.getElementById('universal-edit-form');
-                    const universalMsg = document.getElementById('universal-edit-msg');
-                    const universalTitle = document.getElementById('universal-edit-title');
-                
-                }
+                if (libraryTableBody) {
+                    libraryTableBody.addEventListener('click', async (e) => {
+                        const actionBtn = e.target.closest('.issue-book-btn');
+                        if (!actionBtn) return;
+
+                        const bookId = actionBtn.getAttribute('data-id');
+                        const genre = actionBtn.getAttribute('data-genre');
+                        const bookTitle = actionBtn.closest('tr').querySelector('td:nth-child(2)').textContent;
+                        const universalModal = document.getElementById('universal-edit-modal');
+                        const universalForm = document.getElementById('universal-edit-form');
+                        const universalMsg = document.getElementById('universal-edit-msg');
+                        const universalTitle = document.getElementById('universal-edit-title');
                     
-                    if (universalForm && universalModal) {
-                        // Clear any previous messages and reset form
-                        if (universalMsg) {
-                            universalMsg.textContent = '';
-                            universalMsg.style.display = 'none';
-                        }
-                        
-                        // Set the modal title
-                        if (universalTitle) {
-                            universalTitle.textContent = `Issue Book: ${bookTitle}`;
-                        }
-                        
-                        // Set up the form
-                        const today = new Date().toISOString().split('T')[0];
-                        const defaultDueDate = new Date();
-                        defaultDueDate.setDate(defaultDueDate.getDate() + 14); // 2 weeks from now
-                        const defaultDueDateStr = defaultDueDate.toISOString().split('T')[0];
-                        
-                        universalForm.innerHTML = `
-                            <input type="hidden" name="bookId" value="${bookId}">
-                            <input type="hidden" name="genre" value="${genre}">
-                            <div class="mb-4">
-                                <label class="block text-gray-700 text-sm font-bold mb-2" for="classSelect">
-                                    Class
-                                </label>
-                                <select class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" 
-                                        id="classSelect" name="class" required>
-                                    <option value="">Select a class</option>
-                                    <optgroup label="Pre-Primary">
-                                        <option value="pp1">Pre-Primary 1 (PP1) - Age 4-5</option>
-                                        <option value="pp2">Pre-Primary 2 (PP2) - Age 5-6</option>
-                                    </optgroup>
-                                    <optgroup label="Primary Education">
-                                        <option value="grade1">Grade 1 - Age 6-7</option>
-                                        <option value="grade2">Grade 2 - Age 7-8</option>
-                                        <option value="grade3">Grade 3 - Age 8-9</option>
-                                        <option value="grade4">Grade 4 - Age 9-10</option>
-                                        <option value="grade5">Grade 5 - Age 10-11</option>
-                                        <option value="grade6">Grade 6 - Age 11-12</option>
-                                        <option value="grade7">Grade 7 - Age 12-13</option>
-                                        <option value="grade8">Grade 8 - Age 13-14 (KCPE)</option>
-                                    </optgroup>
-                                    <optgroup label="Secondary Education">
-                                        <option value="form1">Form 1 - Age 14-15</option>
-                                        <option value="form2">Form 2 - Age 15-16</option>
-                                        <option value="form3">Form 3 - Age 16-17</option>
-                                        <option value="form4">Form 4 - Age 17-18 (KCSE)</option>
-                                    </optgroup>
-                                    <optgroup label="Tertiary/College">
-                                        <option value="college1">Year 1 - Certificate/Diploma</option>
-                                        <option value="college2">Year 2 - Certificate/Diploma</option>
-                                        <option value="college3">Year 3 - Diploma/Degree</option>
-                                        <option value="college4">Year 4 - Degree</option>
-                                    </optgroup>
-                                </select>
-                            </div>
-                            <div class="mb-4">
-                                <label class="block text-gray-700 text-sm font-bold mb-2" for="studentSelect">
-                                    Student
-                                </label>
-                                <select class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" 
-                                        id="studentSelect" name="studentId" required disabled>
-                                    <option value="">Select a class first</option>
-                                </select>
-                            </div>
-                            <div class="mb-6">
-                                <label class="block text-gray-700 text-sm font-bold mb-2" for="dueDate">
-                                    Due Date
-                                </label>
-                                <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" 
-                                       id="dueDate" name="dueDate" type="date" required>
-                            </div>
-                            <div class="flex items-center justify-end gap-3">
-                                <button type="button" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline cancel-btn">
-                                    Cancel
-                                </button>
-                                <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline submit-btn">
-                                    <i class="fas fa-book-reader mr-2"></i>Issue Book
-                                </button>
-                            </div>
-                        `;
-                        
-                        console.log('Showing issue modal for book ID:', bookId);
-                        
-                        // Ensure the modal is in the DOM and visible
-                        if (!document.body.contains(universalModal)) {
-                            console.error('Modal element not found in DOM');
-                            return;
-                        }
-                        
-                        // Show the modal
-                        showModal(universalModal);
-                        console.log('Modal display style:', window.getComputedStyle(universalModal).display);
-                        
-                        // Set focus after a short delay to ensure the modal is visible
-                        setTimeout(() => {
-                            const firstInput = universalForm.querySelector('input:not([type="hidden"])');
-                            if (firstInput) {
-                                firstInput.removeAttribute('autofocus'); // Remove autofocus attribute
-                                firstInput.focus({ preventScroll: true });
+                        if (universalForm && universalModal) {
+                            // Clear any previous messages and reset form
+                            if (universalMsg) {
+                                universalMsg.textContent = '';
+                                universalMsg.style.display = 'none';
                             }
-                        }, 50);
-                        
-                        // Handle form submission
-                        // Remove any existing submit handlers to prevent duplicates
-                        const newForm = universalForm.cloneNode(true);
-                        universalForm.parentNode.replaceChild(newForm, universalForm);
-                        
-                        newForm.onsubmit = async (e) => {
-                            e.preventDefault();
                             
-                            const formMsg = document.getElementById('issue-form-msg');
-                            const submitBtn = newForm.querySelector('.submit-btn');
-                            const cancelBtn = newForm.querySelector('.cancel-btn');
+                            // Set the modal title
+                            if (universalTitle) {
+                                universalTitle.textContent = `Issue Book: ${bookTitle}`;
+                            }
                             
-                            // Prevent multiple submissions
-                            if (submitBtn && submitBtn.hasAttribute('data-submitting')) {
+                            // Set up the form
+                            const today = new Date().toISOString().split('T')[0];
+                            const defaultDueDate = new Date();
+                            defaultDueDate.setDate(defaultDueDate.getDate() + 14); // 2 weeks from now
+                            const defaultDueDateStr = defaultDueDate.toISOString().split('T')[0];
+                            
+                            universalForm.innerHTML = `
+                                <input type="hidden" name="bookId" value="${bookId}">
+                                <input type="hidden" name="genre" value="${genre}">
+                                <div class="mb-4">
+                                    <label class="block text-gray-700 text-sm font-bold mb-2" for="classSelect">
+                                        Class
+                                    </label>
+                                    <select class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" 
+                                            id="classSelect" name="class" required>
+                                        <option value="">Select a class</option>
+                                        <optgroup label="Pre-Primary">
+                                            <option value="pp1">Pre-Primary 1 (PP1) - Age 4-5</option>
+                                            <option value="pp2">Pre-Primary 2 (PP2) - Age 5-6</option>
+                                        </optgroup>
+                                        <optgroup label="Primary Education">
+                                            <option value="grade1">Grade 1 - Age 6-7</option>
+                                            <option value="grade2">Grade 2 - Age 7-8</option>
+                                            <option value="grade3">Grade 3 - Age 8-9</option>
+                                            <option value="grade4">Grade 4 - Age 9-10</option>
+                                            <option value="grade5">Grade 5 - Age 10-11</option>
+                                            <option value="grade6">Grade 6 - Age 11-12</option>
+                                            <option value="grade7">Grade 7 - Age 12-13</option>
+                                            <option value="grade8">Grade 8 - Age 13-14 (KCPE)</option>
+                                        </optgroup>
+                                        <optgroup label="Secondary Education">
+                                            <option value="form1">Form 1 - Age 14-15</option>
+                                            <option value="form2">Form 2 - Age 15-16</option>
+                                            <option value="form3">Form 3 - Age 16-17</option>
+                                            <option value="form4">Form 4 - Age 17-18 (KCSE)</option>
+                                        </optgroup>
+                                        <optgroup label="Tertiary/College">
+                                            <option value="college1">Year 1 - Certificate/Diploma</option>
+                                            <option value="college2">Year 2 - Certificate/Diploma</option>
+                                            <option value="college3">Year 3 - Diploma/Degree</option>
+                                            <option value="college4">Year 4 - Degree</option>
+                                        </optgroup>
+                                    </select>
+                                </div>
+                                <div class="mb-4">
+                                    <label class="block text-gray-700 text-sm font-bold mb-2" for="studentSelect">
+                                        Student
+                                    </label>
+                                    <select class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" 
+                                            id="studentSelect" name="studentId" required disabled>
+                                        <option value="">Select a class first</option>
+                                    </select>
+                                </div>
+                                <div class="mb-6">
+                                    <label class="block text-gray-700 text-sm font-bold mb-2" for="dueDate">
+                                        Due Date
+                                    </label>
+                                    <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" 
+                                           id="dueDate" name="dueDate" type="date" required>
+                                </div>
+                                <div class="flex items-center justify-end gap-3">
+                                    <button type="button" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline cancel-btn">
+                                        Cancel
+                                    </button>
+                                    <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline submit-btn">
+                                        <i class="fas fa-book-reader mr-2"></i>Issue Book
+                                    </button>
+                                </div>
+                            `;
+                            
+                            console.log('Showing issue modal for book ID:', bookId);
+                            
+                            // Ensure the modal is in the DOM and visible
+                            if (!document.body.contains(universalModal)) {
+                                console.error('Modal element not found in DOM');
                                 return;
                             }
                             
-                            // Disable buttons and show loading state
-                            if (submitBtn) {
-                                submitBtn.disabled = true;
-                                submitBtn.setAttribute('data-submitting', 'true');
-                                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Issuing...';
-                            }
-                            if (cancelBtn) cancelBtn.disabled = true;
+                            // Show the modal
+                            showModal(universalModal);
+                            console.log('Modal display style:', window.getComputedStyle(universalModal).display);
                             
-                            // Clear previous messages
-                            if (formMsg) {
-                                formMsg.textContent = '';
-                                formMsg.style.display = 'none';
-                            }
+                            // Set focus after a short delay to ensure the modal is visible
+                            setTimeout(() => {
+                                const firstInput = universalForm.querySelector('input:not([type="hidden"])');
+                                if (firstInput) {
+                                    firstInput.removeAttribute('autofocus'); // Remove autofocus attribute
+                                    firstInput.focus({ preventScroll: true });
+                                }
+                            }, 50);
                             
-                            try {
-                                const formData = new FormData(newForm);
-                                const bookId = formData.get('bookId');
-                                const classSelect = newForm.querySelector('#classSelect');
-                                const studentSelect = newForm.querySelector('#studentSelect');
-                                const selectedStudent = studentSelect.options[studentSelect.selectedIndex];
-                                const borrowerName = selectedStudent.textContent;
-                                const borrowerId = formData.get('studentId');
-                                const borrowerEmail = selectedStudent.getAttribute('data-email') || '';
-                                const dueDate = formData.get('dueDate');
-
-                                if (!borrowerId || !dueDate) {
-                                    throw new Error('Please select a student and due date');
-                                }
-
-                                const token = localStorage.getItem('token');
-                                if (!token) {
-                                    throw new Error('Authentication required. Please log in again.');
+                            // Handle form submission
+                            // Remove any existing submit handlers to prevent duplicates
+                            const newForm = universalForm.cloneNode(true);
+                            universalForm.parentNode.replaceChild(newForm, universalForm);
+                            
+                            newForm.onsubmit = async (e) => {
+                                e.preventDefault();
+                                
+                                const formMsg = document.getElementById('issue-form-msg');
+                                const submitBtn = newForm.querySelector('.submit-btn');
+                                const cancelBtn = newForm.querySelector('.cancel-btn');
+                                
+                                // Prevent multiple submissions
+                                if (submitBtn && submitBtn.hasAttribute('data-submitting')) {
+                                    return;
                                 }
                                 
-                                // Get the genre from the book data attribute
-                                const issueButton = document.querySelector(`.issue-book-btn[data-id="${bookId}"]`);
-                                const genre = issueButton ? (issueButton.getAttribute('data-genre') || 'General') : 'General';
-                                
-                                // Debug logging removed from production
-
-                                const response = await fetch(`${API_CONFIG.BASE_URL}/api/library/${bookId}/issue`, {
-                                    method: 'POST',
-                                    headers: {
-                                        'Content-Type': 'application/json',
-                                        'Authorization': `Bearer ${token}`,
-                                    },
-                                    body: JSON.stringify({
-                                        borrowerName,
-                                        borrowerId,
-                                        borrowerEmail,
-                                        dueDate,
-                                        className: classSelect.value,
-                                        genre // Add genre to the request body
-                                    })
-                                });
-                                
-                                const result = await response.json().catch(() => ({}));
-                                
-                                if (!response.ok) {
-                                    const errorData = await response.json().catch(() => ({}));
-                                    throw new Error(errorData.error || 'Failed to issue book. Please try again.');
+                                // Disable buttons and show loading state
+                                if (submitBtn) {
+                                    submitBtn.disabled = true;
+                                    submitBtn.setAttribute('data-submitting', 'true');
+                                    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Issuing...';
                                 }
-
-                                // Show success message
+                                if (cancelBtn) cancelBtn.disabled = true;
+                                
+                                // Clear previous messages
                                 if (formMsg) {
-                                    formMsg.textContent = 'Book issued successfully!';
-                                    formMsg.className = 'mt-3 text-sm text-green-600';
-                                    formMsg.style.display = 'block';
+                                    formMsg.textContent = '';
+                                    formMsg.style.display = 'none';
                                 }
                                 
-                                // Update the UI after a short delay
-                                setTimeout(() => {
-                                    hideModal(universalModal);
-                                    loadLibraryWithFilters();
+                                try {
+                                    const formData = new FormData(newForm);
+                                    const bookId = formData.get('bookId');
+                                    const classSelect = newForm.querySelector('#classSelect');
+                                    const studentSelect = newForm.querySelector('#studentSelect');
+                                    const selectedStudent = studentSelect.options[studentSelect.selectedIndex];
+                                    const borrowerName = selectedStudent.textContent;
+                                    const borrowerId = formData.get('studentId');
+                                    const borrowerEmail = selectedStudent.getAttribute('data-email') || '';
+                                    const dueDate = formData.get('dueDate');
+
+                                    if (!borrowerId || !dueDate) {
+                                        throw new Error('Please select a student and due date');
+                                    }
+
+                                    const token = localStorage.getItem('token');
+                                    if (!token) {
+                                        throw new Error('Authentication required. Please log in again.');
+                                    }
                                     
-                                    // Reset form state
+                                    // Get the genre from the book data attribute
+                                    const issueButton = document.querySelector(`.issue-book-btn[data-id="${bookId}"]`);
+                                    const genre = issueButton ? (issueButton.getAttribute('data-genre') || 'General') : 'General';
+                                    
+                                    // Debug logging removed from production
+
+                                    const response = await fetch(`${API_CONFIG.BASE_URL}/api/library/${bookId}/issue`, {
+                                        method: 'POST',
+                                        headers: {
+                                            'Content-Type': 'application/json',
+                                            'Authorization': `Bearer ${token}`,
+                                        },
+                                        body: JSON.stringify({
+                                            borrowerName,
+                                            borrowerId,
+                                            borrowerEmail,
+                                            dueDate,
+                                            className: classSelect.value,
+                                            genre // Add genre to the request body
+                                        })
+                                    });
+                                    
+                                    const result = await response.json().catch(() => ({}));
+                                    
+                                    if (!response.ok) {
+                                        const errorData = await response.json().catch(() => ({}));
+                                        throw new Error(errorData.error || 'Failed to issue book. Please try again.');
+                                    }
+
+                                    // Show success message
+                                    if (formMsg) {
+                                        formMsg.textContent = 'Book issued successfully!';
+                                        formMsg.className = 'mt-3 text-sm text-green-600';
+                                        formMsg.style.display = 'block';
+                                    }
+                                    
+                                    // Update the UI after a short delay
+                                    setTimeout(() => {
+                                        hideModal(universalModal);
+                                        loadLibraryWithFilters();
+                                        
+                                        // Reset form state
+                                        if (submitBtn) {
+                                            submitBtn.disabled = false;
+                                            submitBtn.removeAttribute('data-submitting');
+                                            submitBtn.innerHTML = '<i class="fas fa-book-reader mr-2"></i>Issue Book';
+                                        }
+                                        if (cancelBtn) cancelBtn.disabled = false;
+                                    }, 1500);
+                                } catch (error) {
+                                    console.error('Error issuing book:', error);
+                                    if (formMsg) {
+                                        formMsg.textContent = error.message || 'An error occurred while processing your request.';
+                                        formMsg.className = 'mt-3 text-sm text-red-600';
+                                        formMsg.style.display = 'block';
+                                        
+                                        // Scroll to the error message
+                                        formMsg.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                                    }
+                                    
+                                    // Re-enable buttons
                                     if (submitBtn) {
                                         submitBtn.disabled = false;
                                         submitBtn.removeAttribute('data-submitting');
                                         submitBtn.innerHTML = '<i class="fas fa-book-reader mr-2"></i>Issue Book';
                                     }
                                     if (cancelBtn) cancelBtn.disabled = false;
-                                }, 1500);
-                            } catch (error) {
-                                console.error('Error issuing book:', error);
-                                if (formMsg) {
-                                    formMsg.textContent = error.message || 'An error occurred while processing your request.';
-                                    formMsg.className = 'mt-3 text-sm text-red-600';
-                                    formMsg.style.display = 'block';
-                                    
-                                    // Scroll to the error message
-                                    formMsg.scrollIntoView({ behavior: 'smooth', block: 'center' });
                                 }
-                                
-                                // Re-enable buttons
-                                if (submitBtn) {
-                                    submitBtn.disabled = false;
-                                    submitBtn.removeAttribute('data-submitting');
-                                    submitBtn.innerHTML = '<i class="fas fa-book-reader mr-2"></i>Issue Book';
-                                }
-                                if (cancelBtn) cancelBtn.disabled = false;
-                            }
-                        };
-                        
-                        // Add cancel button handler
-                        const cancelBtn = universalForm.querySelector('.cancel-btn');
-                        if (cancelBtn) {
-                            cancelBtn.onclick = (e) => {
-                                e.preventDefault();
-                                hideModal(universalModal);
                             };
+                            
+                            // Add cancel button handler
+                            const cancelBtn = universalForm.querySelector('.cancel-btn');
+                            if (cancelBtn) {
+                                cancelBtn.onclick = (e) => {
+                                    e.preventDefault();
+                                    hideModal(universalModal);
+                                };
+                            }
                         }
                     }
                 }
                 // Delete Book (universal confirm modal)
-                else if (btn.classList.contains('delete-book-btn')) {
-                    // Disable the delete button to prevent multiple clicks
-                    btn.disabled = true;
-                    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Deleting...';
-                    
-                    const confirmDelete = confirm('Are you sure you want to delete this book? This action cannot be undone.');
-                    
-                    if (!confirmDelete) {
-                        btn.disabled = false;
-                        btn.innerHTML = '<i class="fas fa-trash"></i>';
-                        return;
-                    }
-                    
-                    (async () => {
-                        try {
-                            const token = localStorage.getItem('token');
-                            if (!token) {
-                                throw new Error('Authentication required. Please log in again.');
-                            }
-                            
-                            const response = await fetch(`${API_CONFIG.BASE_URL}/api/library/${bookId}`, {
-                                method: 'DELETE',
-                                headers: {
-                                    'Authorization': `Bearer ${token}`,
-                                    'Content-Type': 'application/json'
-                                }
-                            });
-                            
-                            // Handle the response
-                            if (response.status === 404) {
-                                throw new Error('Book not found or already deleted');
-                            }
-                            
-                            const result = await response.json().catch(() => ({}));
-                            
-                            if (!response.ok) {
-                                throw new Error(result.error || 'Failed to delete book');
-                            }
-                            
-                            showNotification('Book deleted successfully', 'success');
-                            
-                            // Remove the deleted book from the UI immediately
-                            const rowToRemove = btn.closest('tr');
-                            if (rowToRemove) {
-                                rowToRemove.style.opacity = '0.5';
-                                setTimeout(() => rowToRemove.remove(), 300);
-                            }
-                            
-                            // Refresh the book list after a short delay
-                            setTimeout(() => {
-                                loadLibraryWithFilters().catch(error => {
-                                    console.error('Error refreshing book list:', error);
-                                    showNotification('Error refreshing book list', 'error');
-                                });
-                            }, 500);
-                            
-                        } catch (error) {
-                            console.error('Error deleting book:', error);
-                            showNotification(`Error: ${error.message}`, 'error');
-                        } finally {
-                            // Re-enable the delete button
-                            const deleteButtons = document.querySelectorAll('.delete-book-btn');
-                            deleteButtons.forEach(btn => {
-                                btn.disabled = false;
-                                btn.innerHTML = '<i class="fas fa-trash"></i>';
-                            });
+                else if (libraryTableBody) {
+                    libraryTableBody.addEventListener('click', async (e) => {
+                        const deleteBtn = e.target.closest('.delete-book-btn');
+                        if (!deleteBtn) return;
+
+                        const bookId = deleteBtn.getAttribute('data-id');
+
+                        // Disable the delete button to prevent multiple clicks
+                        deleteBtn.disabled = true;
+                        deleteBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Deleting...';
+                        
+                        const confirmDelete = confirm('Are you sure you want to delete this book? This action cannot be undone.');
+                        
+                        if (!confirmDelete) {
+                            deleteBtn.disabled = false;
+                            deleteBtn.innerHTML = '<i class="fas fa-trash"></i>';
+                            return;
                         }
-                    })();
+                        
+                        (async () => {
+                            try {
+                                const token = localStorage.getItem('token');
+                                if (!token) {
+                                    throw new Error('Authentication required. Please log in again.');
+                                }
+                                
+                                const response = await fetch(`${API_CONFIG.BASE_URL}/api/library/${bookId}`, {
+                                    method: 'DELETE',
+                                    headers: {
+                                        'Authorization': `Bearer ${token}`,
+                                        'Content-Type': 'application/json'
+                                    }
+                                });
+                                
+                                // Handle the response
+                                if (response.status === 404) {
+                                    throw new Error('Book not found or already deleted');
+                                }
+                                
+                                const result = await response.json().catch(() => ({}));
+                                
+                                if (!response.ok) {
+                                    throw new Error(result.error || 'Failed to delete book');
+                                }
+                                
+                                showNotification('Book deleted successfully', 'success');
+                                
+                                // Remove the deleted book from the UI immediately
+                                const rowToRemove = deleteBtn.closest('tr');
+                                if (rowToRemove) {
+                                    rowToRemove.style.opacity = '0.5';
+                                    setTimeout(() => rowToRemove.remove(), 300);
+                                }
+                                
+                                // Refresh the book list after a short delay
+                                setTimeout(() => {
+                                    loadLibraryWithFilters().catch(error => {
+                                        console.error('Error refreshing book list:', error);
+                                        showNotification('Error refreshing book list', 'error');
+                                    });
+                                }, 500);
+                                
+                            } catch (error) {
+                                console.error('Error deleting book:', error);
+                                showNotification(`Error: ${error.message}`, 'error');
+                            } finally {
+                                // Re-enable the delete button
+                                const deleteButtons = document.querySelectorAll('.delete-book-btn');
+                                deleteButtons.forEach(btn => {
+                                    btn.disabled = false;
+                                    btn.innerHTML = '<i class="fas fa-trash"></i>';
+                                });
+                            }
+                        })();
+                    });
                 }
             });
         }
+}
         if (selectAllLibrary) {
             selectAllLibrary.checked = false;
             selectAllLibrary.onchange = async function() {
@@ -635,7 +686,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         updateLibraryBulkToolbarState();
     } catch (err) {
-        libraryTableBody.innerHTML = '<tr><td colspan="5">Error loading library.</td></tr>';
+        libraryTableBody.innerHTML = '<tr><td colspan="9">Error loading library.</td></tr>';
     }
 }
 
@@ -1141,17 +1192,18 @@ function initModal() {
     console.log('✅ Modal initialized successfully');
 }
 
-if (libraryForm) {
-    libraryForm.addEventListener('submit', async (e) => {
+const libraryFormEl = document.getElementById('library-form');
+if (libraryFormEl) {
+    libraryFormEl.addEventListener('submit', async (e) => {
         e.preventDefault();
         
         try {
             // Get form data
-            const formData = new FormData(libraryForm);
+            const formData = new FormData(libraryFormEl);
             const bookId = formData.get('bookId');
             
             // Show loading state
-            const submitButton = libraryForm.querySelector('button[type="submit"]');
+            const submitButton = libraryFormEl.querySelector('button[type="submit"]');
             const originalButtonText = submitButton ? submitButton.innerHTML : null;
             if (submitButton) {
                 submitButton.disabled = true;
@@ -1201,7 +1253,7 @@ if (libraryForm) {
                 );
                 
                 // Reset form and reload books
-                libraryForm.reset();
+                libraryFormEl.reset();
                 const bookIdInput = document.getElementById('book-id');
                 if (bookIdInput) bookIdInput.value = '';
                 
