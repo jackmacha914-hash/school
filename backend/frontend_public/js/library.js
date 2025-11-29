@@ -301,11 +301,18 @@ function initializeLibraryForm() {
     form.parentNode.replaceChild(newForm, form);
     const libraryForm = document.getElementById('library-form');
 
-    // Add submit handler
+    // Add submit handler with better error handling
     libraryForm.onsubmit = async function(e) {
-        e.preventDefault();
+        // Prevent default form submission
+        if (e) {
+            e.preventDefault();
+            e.stopPropagation();
+        } else if (window.event) {
+            window.event.returnValue = false;
+        }
+        
         console.log('Form submission started...');
-
+        
         try {
             // Ensure HTML5 validation passes
             if (typeof libraryForm.reportValidity === 'function' && !libraryForm.reportValidity()) {
@@ -378,8 +385,19 @@ function initializeLibraryForm() {
             // Refresh the book list if the function exists
             if (typeof loadLibraryWithFilters === 'function') {
                 console.log('Refreshing book list...');
-                await loadLibraryWithFilters();
+                alert(`Error: ${error.message || 'Failed to add book. Check console for details.'}`);
             }
+        } catch (error) {
+            console.error('Error in form submission:', {
+                error: error.message,
+                stack: error.stack,
+                name: error.name
+            });
+            alert(`Error: ${error.message || 'Failed to add book. Check console for details.'}`);
+        }
+        
+        // Explicitly return false to prevent form submission
+        return false;
     };
 
     console.log('Library form initialized successfully');
