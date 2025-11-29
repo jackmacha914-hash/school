@@ -2135,12 +2135,23 @@ function initIssuedBooksSearch() {
 
 // Initialize when the script is loaded
 function initializeLibrary() {
+    console.log('Initializing library...');
     // Initialize the library components
     initLibrary();
     initIssuedBooksSearch();
     
     // Show available books tab by default
     showLibraryTab('available-books');
+    
+    // Load the books when the page loads
+    console.log('Loading books...');
+    if (typeof loadLibraryWithFilters === 'function') {
+        loadLibraryWithFilters().catch(error => {
+            console.error('Failed to load books:', error);
+        });
+    } else {
+        console.error('loadLibraryWithFilters is not defined!');
+    }
 }
 
 // Set up event listeners when the DOM is fully loaded
