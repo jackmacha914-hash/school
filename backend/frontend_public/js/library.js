@@ -308,31 +308,44 @@ function initializeLibraryForm() {
 
         try {
             // Get form data
+            const genreValue = document.getElementById('book-genre')?.value 
+                || document.getElementById('library-genre-filter')?.value 
+                || 'Other';
+            const statusValue = document.getElementById('book-status')?.value || 'available';
+
             const formData = {
                 title: document.getElementById('book-title')?.value.trim(),
                 author: document.getElementById('book-author')?.value.trim(),
                 year: parseInt(document.getElementById('book-year')?.value) || new Date().getFullYear(),
-                genre: document.getElementById('book-genre')?.value,
+                genre: genreValue,
                 className: document.getElementById('book-class')?.value,
                 copies: parseInt(document.getElementById('book-copies')?.value) || 1,
                 available: parseInt(document.getElementById('book-copies')?.value) || 1,
-                status: 'available'
+                status: statusValue
             };
 
             console.log('Form data to submit:', formData);
 
             // Validate required fields
-            if (!formData.title || !formData.author || !formData.genre || !formData.className) {
+            if (!formData.title || !formData.author || !formData.className) {
                 alert('Please fill in all required fields');
                 return;
             }
 
+            // Resolve endpoint and ensure auth token exists
+            const url = (window.API_CONFIG && window.API_CONFIG.BOOKS_URL) ? window.API_CONFIG.BOOKS_URL : '/api/books';
+            const token = localStorage.getItem('token');
+            if (!token) {
+                alert('You are not logged in. Please log in and try again.');
+                return;
+            }
+
             // Make the API request
-            const response = await fetch('https://school-93dy.onrender.com/api/books', {
+            const response = await fetch(url, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${localStorage.getItem('token')}` 
+                    'Authorization': `Bearer ${token}` 
                 },
                 body: JSON.stringify(formData)
             });
