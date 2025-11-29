@@ -313,70 +313,73 @@ function initializeLibraryForm() {
                 return;
             }
 
-            // Get form data
-            const genreValue = document.getElementById('book-genre')?.value 
+            // Get form data with debug logging
+            const title = document.getElementById('book-title')?.value.trim();
+            const author = document.getElementById('book-author')?.value.trim();
+            const year = parseInt(document.getElementById('book-year')?.value) || new Date().getFullYear();
+            const genre = document.getElementById('book-genre')?.value 
                 || document.getElementById('library-genre-filter')?.value 
                 || 'Other';
-            const statusValue = document.getElementById('book-status')?.value || 'available';
+            const className = document.getElementById('book-class')?.value;
+            const copies = parseInt(document.getElementById('book-copies')?.value) || 1;
+            const status = document.getElementById('book-status')?.value || 'available';
 
             const formData = {
-                title: document.getElementById('book-title')?.value.trim(),
-                author: document.getElementById('book-author')?.value.trim(),
-                year: parseInt(document.getElementById('book-year')?.value) || new Date().getFullYear(),
-                genre: genreValue,
-                className: document.getElementById('book-class')?.value,
-                copies: parseInt(document.getElementById('book-copies')?.value) || 1,
-                available: parseInt(document.getElementById('book-copies')?.value) || 1,
-                status: statusValue
+                title,
+                author,
+                year,
+                genre,
+                className,
+                copies,
+                available: copies,
+                status
             };
 
             console.log('Form data to submit:', formData);
 
             // Validate required fields
-            if (!formData.title || !formData.author || !formData.className) {
+            if (!title || !author || !className) {
+                console.error('Validation failed: Missing required fields', { title, author, className });
                 alert('Please fill in all required fields');
                 return;
             }
 
-            // Resolve endpoint and ensure auth token exists
-            const url = '/api/books';
+            // Check for token
             const token = localStorage.getItem('token');
             if (!token) {
+                console.error('No auth token found in localStorage');
                 alert('You are not logged in. Please log in and try again.');
                 return;
             }
 
-            console.log('Submitting to endpoint:', url);
-
-            // Make the API request via apiFetch so headers/base URL are consistent
-            const result = await apiFetch(url, {
+            console.log('Submitting to /api/books...');
+            
+            // Make the API request
+            const response = await fetch('/api/books', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}` 
+                    'Authorization': `Bearer ${token}`
                 },
                 body: JSON.stringify(formData)
             });
-            console.log('Server response:', result);
 
-            if (result && result.success === false) {
-                throw new Error(result.message || 'Failed to add book');
+            const result = await response.json().catch(err => ({}));
+            console.log('API Response:', { status: response.status, result });
+
+            if (!response.ok) {
+                throw new Error(result.message || `HTTP error! status: ${response.status}`);
             }
 
-            // Show success message
+            console.log('Book added successfully!');
             alert('Book added successfully!');
             libraryForm.reset();
             
-            // Refresh the book list
+            // Refresh the book list if the function exists
             if (typeof loadLibraryWithFilters === 'function') {
                 console.log('Refreshing book list...');
                 await loadLibraryWithFilters();
             }
-
-        } catch (error) {
-            console.error('Error:', error);
-            alert('Error: ' + (error.message || 'Failed to add book'));
-        }
     };
 
     console.log('Library form initialized successfully');
@@ -2240,6 +2243,14 @@ function initializeLibrary() {
     // Initialize the library components
     initLibrary();
     initIssuedBooksSearch();
+    
+    // Initialize the library form
+    if (typeof initializeLibraryForm === 'function') {
+        console.log('Initializing library form...');
+        initializeLibraryForm();
+    } else {
+        console.error('initializeLibraryForm is not defined!');
+    }
     
     // Show available books tab by default
     showLibraryTab('available-books');
