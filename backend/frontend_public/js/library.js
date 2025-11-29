@@ -285,64 +285,74 @@ const API_BASE_URL = window.API_CONFIG?.BASE_URL || 'https://school-93dy.onrende
                     }
                 }
 
-                    // Add New Book Handler
+                 // Add New Book Handler
 document.addEventListener('DOMContentLoaded', () => {
-const libraryForm = document.getElementById('library-form');
+    const libraryForm = document.getElementById('library-form');
 
-if (libraryForm) {
-    libraryForm.addEventListener('submit', async (e) => {
-        e.preventDefault();
+    if (libraryForm) {
+        libraryForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            console.log('Form submission started');
 
-        const title = document.getElementById('book-title').value.trim();
-        const author = document.getElementById('book-author').value.trim();
-        const year = parseInt(document.getElementById('book-year').value) || new Date().getFullYear();
-        const genre = document.getElementById('book-genre').value;
-        const className = document.getElementById('book-class').value;
-        const available = parseInt(document.getElementById('book-available').value) || 1;
+            // Get form values
+            const formData = {
+                title: document.getElementById('book-title').value.trim(),
+                author: document.getElementById('book-author').value.trim(),
+                year: parseInt(document.getElementById('book-year').value) || new Date().getFullYear(),
+                genre: document.getElementById('book-genre').value,
+                className: document.getElementById('book-class').value,
+                available: parseInt(document.getElementById('book-available').value) || 1
+            };
 
-        if (!title || !author || !genre || !className) {
-            alert('Please fill in all required fields.');
-            return;
-        }
+            console.log('Form data:', formData);
 
-        const token = localStorage.getItem('token');
-        if (!token) {
-            alert('You are not logged in. Please log in first.');
-            return;
-        }
-
-        console.log('Adding book:', { title, author, year, genre, className, available });
-        console.log('POST URL:', `${window.API_CONFIG.BOOKS_URL}/books`);
-        console.log('Token:', token);
-
-        try {
-            const res = await fetch(`${window.API_CONFIG.BOOKS_URL}/books`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
-                },
-                body: JSON.stringify({ title, author, year, genre, className, available })
-            });
-
-            const data = await res.json().catch(() => ({}));
-
-            if (res.ok) {
-                alert('Book added successfully!');
-                libraryForm.reset();
-                loadLibraryWithFilters();
-            } else {
-                console.error('Failed to add book:', data);
-                alert('Failed to add book: ' + (data.message || 'Unknown error'));
+            // Validate required fields
+            if (!formData.title || !formData.author || !formData.genre || !formData.className) {
+                alert('Please fill in all required fields (Title, Author, Genre, and Class).');
+                return;
             }
-        } catch (err) {
-            console.error('Network error while adding book:', err);
-            alert('Network error. Could not add book.');
-        }
-    });
-}
 
+            try {
+                // Use the correct API URL from your config
+                const apiUrl = `${window.API_CONFIG.API_BASE_URL || window.API_CONFIG.BOOKS_URL || ''}/books`;
+                console.log('Making request to:', apiUrl);
 
+                const res = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    },
+                    body: JSON.stringify(formData)
+                });
+
+                const data = await res.json().catch(() => ({}));
+
+                if (res.ok) {
+                    alert('Book added successfully!');
+                    libraryForm.reset();
+                    if (typeof loadLibraryWithFilters === 'function') {
+                        loadLibraryWithFilters();
+                    }
+                } else {
+                    console.error('Failed to add book:', {
+                        status: res.status,
+                        statusText: res.statusText,
+                        data: data
+                    });
+                    alert(`Failed to add book: ${data.message || 'Unknown error'}`);
+                }
+            } catch (err) {
+                console.error('Error adding book:', {
+                    error: err,
+                    message: err.message,
+                    stack: err.stack
+                });
+                alert('Network error. Could not add book. Check console for details.');
+            }
+        });
+    }
+});
                 // Issue Book
                 else if (btn.classList.contains('issue-book-btn')) {
                     console.log('Issue button clicked'); // Debug log
