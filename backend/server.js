@@ -1,3 +1,4 @@
+
 const express = require('express');
 const mongoose = require('mongoose');
 const path = require('path');
@@ -17,7 +18,7 @@ connectDB();
 // Global CORS – allow frontend domain
 // -------------------------
 app.use(cors({
-  origin: "https://school-93dy.onrender.com", // frontend hosted domain
+  origin: "https://eagles-emulators-schools.onrender.com", // frontend hosted domain
   methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization"],
   credentials: true
